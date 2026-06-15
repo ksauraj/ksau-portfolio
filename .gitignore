@@ -41,3 +41,7 @@ next-env.d.ts
 .claude
 .playwright
 
+# OpenNext and Wrangler
+/.open-next/
+/.wrangler/
+.dev.vars
