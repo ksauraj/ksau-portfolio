@@ -15,7 +15,7 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
 
     const startTimeout = setTimeout(() => {
       interval = setInterval(() => {
-        setText((prev) => {
+        setText(() => {
           return targetText
             .split('')
             .map((char, index) => {
