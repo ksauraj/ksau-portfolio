@@ -1,0 +1,192 @@
+% Resume based on MIT-licensed template by Jake Gutierrez
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+\titleformat{\section}{\vspace{-4pt}\scshape\raggedright\large}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+\pdfgentounicode=1
+
+\newcommand{\resumeItem}[1]{\item\small{{#1 \vspace{-2pt}}}}
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+  \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+    \textbf{#1} & #2 \\
+    \textit{\small#3} & \textit{\small #4} \\
+  \end{tabular*}\vspace{-7pt}
+}
+\newcommand{\resumeProjectHeading}[2]{
+  \item
+  \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+    \small#1 & #2 \\
+  \end{tabular*}\vspace{-7pt}
+}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]} 
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    {\Huge \scshape Sauraj Kumar Singh} \\ \vspace{1pt}
+    Noida, India \quad $|$ \quad +91-8986328898 \quad $|$ \href{mailto:ksauraj1@gmail.com}{ksauraj1@gmail.com} \\
+    \href{https://linkedin.com/in/sauraj-kumar-singh-807295226}{linkedin.com/in/sauraj-kumar-singh} \quad $|$ 
+    \href{https://github.com/ksauraj}{github.com/ksauraj} \quad $|$ 
+    \href{https://ksauraj.eu.org}{ksauraj.eu.org}
+
+
+\end{center}
+
+    \vspace{4pt}
+\small{\textbf{MBTI: INTP} --- Introverted, Intuitive, Thinking, Perceiving}
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Software Engineer Intern - DevOps}{May 2025 -- Present}
+      {ES Magico AI Studio}{Remote}
+      \resumeItemListStart
+        \resumeItem{Led deployment setup across multiple projects using Docker and GitHub Actions.}
+        \resumeItem{Set up scalable monitoring and load balancing with multi-instance support inside custom VPCs.}
+        \resumeItem{Migrated DNS infrastructure from Route 53 to Cloudflare and integrated Kong API Gateway for multiple projects.}
+        \resumeItem{Integrated a comprehensive security pipeline into the main DevOps workflow, automating threat detection, password strength validation, and DDoS monitoring using custom scripts and tools.}
+        \resumeItem{Automated provisioning and infrastructure using Terraform, Ansible, and Make-based workflows.}
+        \resumeItem{Designed and implemented Azure infrastructure including Virtual Networks (VNet), Application Gateway, and Virtual Machine Scale Sets (VMSS) for high availability and controlled traffic routing.}
+        \resumeItem{Built and managed AWS infrastructure with VPC design, Application Load Balancers (ALB), and Auto Scaling Groups to support horizontally scalable services.}
+        \resumeItem{Developed custom scripts to manage and inject environment variables securely using HashiCorp Vault across multiple environments.}
+        \resumeItem{Performed load and stress testing on production-like environments to validate scalability, fault tolerance, and traffic handling limits.}
+      \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Backend Developer Intern}{Feb 2025 -- June 2025}
+      {Welmun-Tech India Pvt Ltd}{Remote}
+      \resumeItemListStart
+        \resumeItem{Contributed to DevOps practices including CI/CD pipelines, containerization using Docker, and basic Kubernetes orchestration.}
+        \resumeItem{Assisted in architecting microservices and applying event-driven design patterns for modular services.}
+      \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+%-----------OPEN SOURCE-----------
+\section{Open Source Contributions}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Maintainer}{2021 -- 2022}
+      {}{}
+      {\textbf{CipherOS} \href{https://cipheros.online}{\textbar{} cipheros.online}} \\
+      \resumeItemListStart
+        \resumeItem{Maintained device tree for RMX2151 and handled CI/CD workflows to automate Android build releases.}
+        \resumeItem{Managed project automation via GitHub Actions and optimized pipeline performance and debugging.}
+      \resumeItemListEnd
+
+      \vspace{4pt}
+      {\textbf{PixelPlusUI} \href{https://ppui.site/}{\textbar{} ppui.site} \href{https://xdaforums.com/t/rom-official-11-0-rmx2151-pixelplus-ui-3-9-aosp-2021-09-12.4283233/}{\textbar{} XDA Thread}} \\
+      \resumeItemListStart
+        \resumeItem{Maintained Android ROM builds for RMX2151 and provided timely OTA updates to the community.}
+        \resumeItem{Authored utility scripts to streamline test builds and automated file uploads for CI-based workflows.}
+      \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+
+%-----------PROJECTS-----------
+\section{Selected Projects}
+  \resumeSubHeadingListStart
+    \resumeProjectHeading
+      {\textbf{ksau CLI/Web Tool} \emph{(Go, Bash)} \href{https://github.com/global-index-source/ksau-go}{[GitHub]}}{2021 - 2025}
+      \resumeItemListStart
+        \resumeItem{Designed a CLI and web tool for file uploads to OneDrive using Microsoft Graph API.}
+        \resumeItem{Migrated from Bash to Golang for better concurrency, performance, and maintainability.}
+        \resumeItem{Developed the backend API, which is used in the ksau-py, and designed the web version.}
+        \resumeItem{Deployed link: \href{https://ksau.ksauraj.eu.org}{ksau.ksauraj.eu.org}.}
+      \resumeItemListEnd
+
+
+    \resumeProjectHeading
+      {\textbf{JEE Counsellor} \emph{(Python)} \href{https://github.com/ksauraj/jee_counsellor}{[GitHub]}}{2023}
+      \resumeItemListStart
+        \resumeItem{Developed a terminal tool to help students with JEE counseling procedures.}
+        \resumeItem{Parsed official data and provided personalized suggestions via terminal UX.}
+      \resumeItemListEnd
+
+    \resumeProjectHeading
+      {\textbf{Telegram Bash Bot} \href{https://github.com/ksauraj/telegram-bash-bot}{[GitHub]}}{2022}
+      \resumeItemListStart
+        \resumeItem{Created a Telegram bot in Bash, capable of performing API-driven tasks via Telegram.}
+        \resumeItem{Used as a base template for Bash-based bot development over the Telegram API.}
+      \resumeItemListEnd
+
+    \resumeProjectHeading
+      {\textbf{Android Automation} \emph{(Python, GitHub API, GitLab API, Telegram API)} \href{https://github.com/autoandroida}{[GitHub]}}{2022}
+      \resumeItemListStart
+        \resumeItem{Built a Telegram Bot-powered service to automate Android firmware dumps, recovery creation, and repo setup.}
+        \resumeItem{Streamlined Android custom ROM contributions with minimal manual input.}
+      \resumeItemListEnd
+
+    \resumeProjectHeading
+      {\textbf{K8au Shell Analyzer} \emph{(Go, TUI, AI)} \href{https://github.com/ksauraj/k8au-shell-analyzer}{[GitHub]}}{2024}
+      \resumeItemListStart
+        \resumeItem{Interactive terminal tool that analyzes shell command history to discover behavioral patterns.}
+        \resumeItem{Used LLM-based NLP to cluster and summarize usage insights.}
+      \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+
+
+%-----------SKILLS-----------
+%-----------SKILLS-----------
+\section{Technical Skills}
+\begin{itemize}[leftmargin=0.15in, label={}]
+  \small{\item{
+    \textbf{Languages}{: Go, Python, Bash, C, JavaScript, HTML/CSS, YAML, SQL} \\
+
+    \textbf{DevOps \& Automation}{: Docker, Kubernetes, Helm, GitHub Actions, GitLab CI, Ansible, Terraform, Makefile, Docker Compose, CI/CD Pipelines, Infrastructure as Code (IaC)} \\
+
+    \textbf{Cloud \& Platforms}{: AWS (EC2, S3, IAM, ECS, Fargate, VPC, ALB, Auto Scaling, CloudFront, CloudWatch), Azure (VNet, VMSS, Application Gateway), GCP, Oracle Cloud, Linode, Microsoft Graph API} \\
+
+    \textbf{Observability \& Monitoring}{: Prometheus, Grafana, Loki, Promtail, Node Exporter, cAdvisor, Wazuh, Log Aggregation, Alerting} \\
+
+    \textbf{Networking}{: TCP/IP, DNS, HTTP/HTTPS, TLS/SSL, Load Balancing, Reverse Proxies, Routing, Subnetting, VPN, API Gateways, Network Troubleshooting} \\
+
+    \textbf{Security \& DevSecOps}{: HashiCorp Vault, SBOM Generation, Container Security, Secret Management, Vulnerability Scanning, Security Automation, PCI DSS Fundamentals, DDoS Detection, Access Control} \\
+
+    \textbf{Databases}{: MySQL, Database Design, Query Optimization} \\
+
+    \textbf{Linux \& Systems}{: Linux, Systemd, Shell Scripting, Tmux, Vim, Process Management, Server Administration} \\
+
+    \textbf{Tools \& Technologies}{: Git, REST APIs, Webhooks, Kong API Gateway, Nginx, Caddy, Railway, Heroku, Cirrus CI, Android Build System, Android Firmware Development}
+  }}
+\end{itemize}
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Bachelor of Technology (B.Tech.)}{2023 -- 2027}
+      {Information Technology, AKTU}{CGPA: 8.1}
+  \resumeSubHeadingListEnd
+
+\end{document}
