@@ -16,16 +16,18 @@ export default function Home() {
   return (
     <>
       <Loader onComplete={() => setIsLoading(false)} />
-      <main className="relative min-h-screen bg-black text-white">
-        <Navbar />
-        <Hero />
-        <About />
-        <Skills />
-        <Experience />
-        <Projects />
-        <OpenSource />
-        <Footer />
-      </main>
+      {!isLoading && (
+        <main className="relative min-h-screen bg-black text-white">
+          <Navbar />
+          <Hero />
+          <About />
+          <Skills />
+          <Experience />
+          <Projects />
+          <OpenSource />
+          <Footer />
+        </main>
+      )}
     </>
   )
 }
