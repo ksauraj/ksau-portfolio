@@ -7,6 +7,7 @@ import Skills from '@/components/sections/Skills'
 import Experience from '@/components/sections/Experience'
 import Projects from '@/components/sections/Projects'
 import OpenSource from '@/components/sections/OpenSource'
+import Education from '@/components/sections/Education'
 import Footer from '@/components/sections/Footer'
 import Loader from '@/components/ui/Loader'
 
@@ -25,6 +26,7 @@ export default function Home() {
           <Experience />
           <Projects />
           <OpenSource />
+          <Education />
           <Footer />
         </main>
       )}

@@ -3,6 +3,8 @@ export const personalInfo = {
   role: 'DevOps Engineer',
   email: 'ksauraj1@gmail.com',
   location: 'India',
+  logoName: 'Sauraj/>',
+  logoSub: 'DevOps Engineer',
   mbti: {
     type: 'INTP',
     description: 'Introverted, Intuitive, Thinking, Perceiving'
@@ -10,8 +12,20 @@ export const personalInfo = {
   socials: [
     { label: 'GitHub', href: 'https://github.com/ksauraj' },
     { label: 'LinkedIn', href: 'https://linkedin.com/in/sauraj-kumar-singh-807295226' },
+    { label: 'Telegram', href: 'https://ksauraj.t.me' },
+    { label: 'Twitter', href: 'https://twitter.com/k_sauraj' },
+    { label: 'Instagram', href: 'https://instagram.com/ksauraj__' },
+    { label: 'GitLab', href: 'https://gitlab.com/ksauraj' },
+    { label: 'YouTube', href: 'https://www.youtube.com/c/SaurajGaming' },
     { label: 'Website', href: 'https://ksauraj.eu.org' }
   ]
+}
+
+// Animation Configurations
+export const animationConfig = {
+  // Centralized duration in milliseconds for the stats counting animation.
+  // Set to a lower number (e.g., 1500) to speed up, or a higher number (e.g., 2500) to slow down.
+  statsDuration: 2000,
 }
 
 export const heroPhrases = [
