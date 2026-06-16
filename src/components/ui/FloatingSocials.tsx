@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef } from 'react'
-import { personalInfo } from '@/data/content'
+import { personalInfo, animationConfig } from '@/data/content'
 
 interface SocialNode {
   name: string
@@ -47,12 +47,12 @@ export default function FloatingSocials() {
   const elementRefs = useRef<(HTMLAnchorElement | null)[]>([])
   const nodesRef = useRef<SocialNode[]>([])
   const mouseRef = useRef({ x: 0, y: 0, active: false })
-  const randomGlowRef = useRef<{
+  const activeGlowsRef = useRef<{
     n1Index: number
     n2Index: number
     alpha: number
     phase: 'in' | 'out'
-  } | null>(null)
+  }[]>([])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -60,31 +60,76 @@ export default function FloatingSocials() {
     const w = rect.width || 500
     const h = rect.height || 500
 
-    const cols = 3
-    const rows = 3
-
-    // Left bound: 50% of screen. Right bound: 90% of screen.
-    // Container is w wide (55vw) aligned right, so container left is 45vw of screen.
-    // 50% is 5vw inside container: 5/55 = 1/11 of w.
-    // 90% is 45vw inside container: 45/55 = 9/11 of w.
+    const R = animationConfig.socials.layoutRadius
     const leftBound = Math.max(80 / 2, (1 / 11) * w)
     const rightBound = Math.min(w - 80 / 2, (9 / 11) * w)
-    const rangeW = Math.max(50, rightBound - leftBound)
+
+    // Center of bounds
+    const boundsCenterX = (leftBound + rightBound) / 2
+    const boundsCenterY = h / 2
+
+    const n = socialData.length
+    const offsets: { dx: number; dy: number }[] = []
+
+    if (n % 2 === 0) {
+      // Even number of nodes: Dual centers (first 2 nodes) + Elliptical outer ring (n - 2 nodes)
+      const d = R * 0.4 // distance of focus points from center
+      offsets.push({ dx: -d, dy: 0 })
+      offsets.push({ dx: d, dy: 0 })
+
+      const outerCount = n - 2
+      const a = R * 1.2 // Horizontal radius of the ellipse
+      const b = R * 0.9 // Vertical radius of the ellipse
+      for (let k = 0; k < outerCount; k++) {
+        const angle = (k * 2 * Math.PI) / outerCount
+        offsets.push({
+          dx: a * Math.cos(angle),
+          dy: b * Math.sin(angle),
+        })
+      }
+    } else {
+      // Odd number of nodes: Single center (first node) + Circular outer ring (n - 1 nodes)
+      offsets.push({ dx: 0, dy: 0 })
+
+      const outerCount = n - 1
+      for (let k = 0; k < outerCount; k++) {
+        const angle = (k * 2 * Math.PI) / outerCount
+        offsets.push({
+          dx: R * Math.cos(angle),
+          dy: R * Math.sin(angle),
+        })
+      }
+    }
+
+    // Centering calculations
+    let minDx = 0
+    let maxDx = 0
+    let minDy = 0
+    let maxDy = 0
+    offsets.forEach(off => {
+      if (off.dx < minDx) minDx = off.dx
+      if (off.dx > maxDx) maxDx = off.dx
+      if (off.dy < minDy) minDy = off.dy
+      if (off.dy > maxDy) maxDy = off.dy
+    })
+
+    const hcCenterX = (minDx + maxDx) / 2
+    const hcCenterY = (minDy + maxDy) / 2
+
+    const cx = boundsCenterX - hcCenterX
+    const cy = boundsCenterY - hcCenterY
 
     const initialNodes = socialData.map((d, index) => {
-      const colIndex = index % cols
-      const rowIndex = Math.floor(index / cols)
-      const cellH = h / rows
-
-      const x = leftBound + (colIndex / (cols - 1 || 1)) * rangeW * (0.8 + Math.random() * 0.2)
-      const y = cellH * (rowIndex + 0.2 + Math.random() * 0.6)
+      const offset = offsets[index] || { dx: (Math.random() - 0.5) * R, dy: (Math.random() - 0.5) * R }
+      const x = cx + offset.dx
+      const y = cy + offset.dy
 
       return {
         ...d,
         x,
         y,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
+        vx: 0, // start static in clean structure
+        vy: 0,
         size: 80,
       }
     })
@@ -152,59 +197,61 @@ export default function FloatingSocials() {
         })
       }
 
-      // Choose a random close pair to glow if none is active
-      if (!randomGlowRef.current && Math.random() < 0.008) {
+      const maxGlows = animationConfig.socials.maxSimultaneousGlows
+      const activeGlows = activeGlowsRef.current
+
+      // Spawn a new glow if under the limit
+      if (activeGlows.length < maxGlows && Math.random() < animationConfig.socials.glowSpawnProbability) {
         const candidatePairs: [number, number][] = []
         for (let i = 0; i < nodes.length; i++) {
           for (let j = i + 1; j < nodes.length; j++) {
             const dx = nodes[i].x - nodes[j].x
             const dy = nodes[i].y - nodes[j].y
             const dist = Math.sqrt(dx * dx + dy * dy)
-            if (dist < 320) {
-              candidatePairs.push([i, j])
+            if (dist < animationConfig.socials.maxConnectionDist) {
+              const isAlreadyGlowing = activeGlows.some(
+                g => (g.n1Index === i && g.n2Index === j) || (g.n1Index === j && g.n2Index === i)
+              )
+              if (!isAlreadyGlowing) {
+                candidatePairs.push([i, j])
+              }
             }
           }
         }
         if (candidatePairs.length > 0) {
           const [p1, p2] = candidatePairs[Math.floor(Math.random() * candidatePairs.length)]
-          randomGlowRef.current = {
+          activeGlows.push({
             n1Index: p1,
             n2Index: p2,
             alpha: 0,
             phase: 'in'
-          }
+          })
         }
       }
 
       // Update active random line glow animation
-      if (randomGlowRef.current) {
-        const glow = randomGlowRef.current
+      activeGlowsRef.current = activeGlows.map(glow => {
         const n1 = nodes[glow.n1Index]
         const n2 = nodes[glow.n2Index]
-        if (!n1 || !n2) {
-          randomGlowRef.current = null
-        } else {
-          const dx = n1.x - n2.x
-          const dy = n1.y - n2.y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist > 320) {
-            randomGlowRef.current = null
-          } else {
-            if (glow.phase === 'in') {
-              glow.alpha += 0.012 // Fade in speed
-              if (glow.alpha >= 0.45) {
-                glow.alpha = 0.45
-                glow.phase = 'out'
-              }
-            } else {
-              glow.alpha -= 0.008 // Fade out speed
-              if (glow.alpha <= 0) {
-                randomGlowRef.current = null
-              }
-            }
+        if (!n1 || !n2) return null
+
+        const dx = n1.x - n2.x
+        const dy = n1.y - n2.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist > animationConfig.socials.maxConnectionDist) return null
+
+        if (glow.phase === 'in') {
+          glow.alpha += 0.016
+          if (glow.alpha >= animationConfig.socials.randomGlowIntensity) {
+            glow.alpha = animationConfig.socials.randomGlowIntensity
+            glow.phase = 'out'
           }
+        } else {
+          glow.alpha -= 0.012
+          if (glow.alpha <= 0) return null
         }
-      }
+        return glow
+      }).filter((g): g is NonNullable<typeof g> => g !== null)
 
       // Draw mesh lines connecting nodes on the canvas
       const canvas = canvasRef.current
@@ -225,26 +272,29 @@ export default function FloatingSocials() {
               const dy = n1.y - n2.y
               const dist = Math.sqrt(dx * dx + dy * dy)
 
-              if (dist < 320) {
-                const proximity = 1 - dist / 320
-                let alpha = proximity * 0.08 // Very thin base line (max 0.08 opacity)
+              if (dist < animationConfig.socials.maxConnectionDist) {
+                const proximity = 1 - dist / animationConfig.socials.maxConnectionDist
+                let alpha = proximity * animationConfig.socials.baseLineOpacity
                 let lineWidth = 0.5
 
                 if (mouse.active) {
                   const mouseDist = getDistanceToSegment(mouse.x, mouse.y, n1.x, n1.y, n2.x, n2.y)
                   // If cursor is near this line segment, activate it
-                  if (mouseDist < 150) {
-                    const glowFactor = 1 - mouseDist / 150
-                    alpha += glowFactor * 0.40 // Substantially brighter (up to 0.48 opacity)
-                    lineWidth = 0.5 + glowFactor * 1.0 // Slightly thicker
+                  if (mouseDist < animationConfig.socials.mouseSegmentThreshold) {
+                    const glowFactor = 1 - mouseDist / animationConfig.socials.mouseSegmentThreshold
+                    alpha += glowFactor * animationConfig.socials.mouseGlowIntensity
+                    lineWidth = 0.5 + glowFactor * 1.0
                   }
                 }
 
-                // Apply random glow if this is the active pair
-                const rGlow = randomGlowRef.current
-                if (rGlow && ((rGlow.n1Index === i && rGlow.n2Index === j) || (rGlow.n1Index === j && rGlow.n2Index === i))) {
-                  alpha += rGlow.alpha
-                  lineWidth = Math.max(lineWidth, 0.5 + (rGlow.alpha / 0.45) * 1.0)
+                // Apply active random line glow if it matches the current segment
+                const currentGlows = activeGlowsRef.current
+                const match = currentGlows.find(
+                  g => (g.n1Index === i && g.n2Index === j) || (g.n1Index === j && g.n2Index === i)
+                )
+                if (match) {
+                  alpha += match.alpha
+                  lineWidth = Math.max(lineWidth, 0.5 + (match.alpha / animationConfig.socials.randomGlowIntensity) * 1.0)
                 }
 
                 ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`
