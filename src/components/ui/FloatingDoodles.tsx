@@ -72,37 +72,6 @@ function FloatingDoodlesComponent({ count = 18, isFastGlow = false }: { count?: 
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes float-glow-normal {
-          0% {
-            transform: translate3d(0, 0, 0) rotate(0deg);
-            opacity: 0.03;
-          }
-          50% {
-            transform: translate3d(10px, -20px, 0) rotate(180deg);
-            opacity: 0.16;
-          }
-          100% {
-            transform: translate3d(0, 0, 0) rotate(360deg);
-            opacity: 0.03;
-          }
-        }
-        @keyframes float-glow-fast {
-          0% {
-            transform: translate3d(0, 0, 0) rotate(0deg);
-            opacity: 0.03;
-          }
-          50% {
-            transform: translate3d(12px, -24px, 0) rotate(180deg);
-            opacity: 0.22;
-          }
-          100% {
-            transform: translate3d(0, 0, 0) rotate(360deg);
-            opacity: 0.03;
-          }
-        }
-      `}} />
-      
       {items.map((item) => (
         <div
           key={item.id}
@@ -112,6 +81,7 @@ function FloatingDoodlesComponent({ count = 18, isFastGlow = false }: { count?: 
             left: `${item.left}%`,
             transform: `scale(${item.scale})`,
             animation: `${animationName} ${item.duration}s ease-in-out ${item.delay}s infinite`,
+            opacity: 0.05,
             willChange: 'transform, opacity',
           }}
         >

@@ -31,11 +31,28 @@ const socialData = personalInfo.socials.map((s) => ({
   icon: socialIcons[s.label.toLowerCase()] || socialIcons['website'],
 }))
 
+function getDistanceToSegment(px: number, py: number, x1: number, y1: number, x2: number, y2: number) {
+  const dx = x2 - x1
+  const dy = y2 - y1
+  const l2 = dx * dx + dy * dy
+  if (l2 === 0) return Math.sqrt((px - x1) ** 2 + (py - y1) ** 2)
+  let t = ((px - x1) * dx + (py - y1) * dy) / l2
+  t = Math.max(0, Math.min(1, t))
+  return Math.sqrt((px - (x1 + t * dx)) ** 2 + (py - (y1 + t * dy)) ** 2)
+}
+
 export default function FloatingSocials() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const elementRefs = useRef<(HTMLAnchorElement | null)[]>([])
   const nodesRef = useRef<SocialNode[]>([])
   const mouseRef = useRef({ x: 0, y: 0, active: false })
+  const randomGlowRef = useRef<{
+    n1Index: number
+    n2Index: number
+    alpha: number
+    phase: 'in' | 'out'
+  } | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -45,13 +62,21 @@ export default function FloatingSocials() {
 
     const cols = 3
     const rows = 3
+
+    // Left bound: 50% of screen. Right bound: 90% of screen.
+    // Container is w wide (55vw) aligned right, so container left is 45vw of screen.
+    // 50% is 5vw inside container: 5/55 = 1/11 of w.
+    // 90% is 45vw inside container: 45/55 = 9/11 of w.
+    const leftBound = Math.max(80 / 2, (1 / 11) * w)
+    const rightBound = Math.min(w - 80 / 2, (9 / 11) * w)
+    const rangeW = Math.max(50, rightBound - leftBound)
+
     const initialNodes = socialData.map((d, index) => {
       const colIndex = index % cols
       const rowIndex = Math.floor(index / cols)
-      const cellW = w / cols
       const cellH = h / rows
 
-      const x = cellW * (colIndex + 0.2 + Math.random() * 0.6)
+      const x = leftBound + (colIndex / (cols - 1 || 1)) * rangeW * (0.8 + Math.random() * 0.2)
       const y = cellH * (rowIndex + 0.2 + Math.random() * 0.6)
 
       return {
@@ -127,6 +152,113 @@ export default function FloatingSocials() {
         })
       }
 
+      // Choose a random close pair to glow if none is active
+      if (!randomGlowRef.current && Math.random() < 0.008) {
+        const candidatePairs: [number, number][] = []
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const dx = nodes[i].x - nodes[j].x
+            const dy = nodes[i].y - nodes[j].y
+            const dist = Math.sqrt(dx * dx + dy * dy)
+            if (dist < 320) {
+              candidatePairs.push([i, j])
+            }
+          }
+        }
+        if (candidatePairs.length > 0) {
+          const [p1, p2] = candidatePairs[Math.floor(Math.random() * candidatePairs.length)]
+          randomGlowRef.current = {
+            n1Index: p1,
+            n2Index: p2,
+            alpha: 0,
+            phase: 'in'
+          }
+        }
+      }
+
+      // Update active random line glow animation
+      if (randomGlowRef.current) {
+        const glow = randomGlowRef.current
+        const n1 = nodes[glow.n1Index]
+        const n2 = nodes[glow.n2Index]
+        if (!n1 || !n2) {
+          randomGlowRef.current = null
+        } else {
+          const dx = n1.x - n2.x
+          const dy = n1.y - n2.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist > 320) {
+            randomGlowRef.current = null
+          } else {
+            if (glow.phase === 'in') {
+              glow.alpha += 0.012 // Fade in speed
+              if (glow.alpha >= 0.45) {
+                glow.alpha = 0.45
+                glow.phase = 'out'
+              }
+            } else {
+              glow.alpha -= 0.008 // Fade out speed
+              if (glow.alpha <= 0) {
+                randomGlowRef.current = null
+              }
+            }
+          }
+        }
+      }
+
+      // Draw mesh lines connecting nodes on the canvas
+      const canvas = canvasRef.current
+      if (canvas) {
+        const ctx = canvas.getContext('2d')
+        if (ctx) {
+          if (canvas.width !== w || canvas.height !== h) {
+            canvas.width = w
+            canvas.height = h
+          }
+          ctx.clearRect(0, 0, w, h)
+
+          for (let i = 0; i < nodes.length; i++) {
+            for (let j = i + 1; j < nodes.length; j++) {
+              const n1 = nodes[i]
+              const n2 = nodes[j]
+              const dx = n1.x - n2.x
+              const dy = n1.y - n2.y
+              const dist = Math.sqrt(dx * dx + dy * dy)
+
+              if (dist < 320) {
+                const proximity = 1 - dist / 320
+                let alpha = proximity * 0.08 // Very thin base line (max 0.08 opacity)
+                let lineWidth = 0.5
+
+                if (mouse.active) {
+                  const mouseDist = getDistanceToSegment(mouse.x, mouse.y, n1.x, n1.y, n2.x, n2.y)
+                  // If cursor is near this line segment, activate it
+                  if (mouseDist < 150) {
+                    const glowFactor = 1 - mouseDist / 150
+                    alpha += glowFactor * 0.40 // Substantially brighter (up to 0.48 opacity)
+                    lineWidth = 0.5 + glowFactor * 1.0 // Slightly thicker
+                  }
+                }
+
+                // Apply random glow if this is the active pair
+                const rGlow = randomGlowRef.current
+                if (rGlow && ((rGlow.n1Index === i && rGlow.n2Index === j) || (rGlow.n1Index === j && rGlow.n2Index === i))) {
+                  alpha += rGlow.alpha
+                  lineWidth = Math.max(lineWidth, 0.5 + (rGlow.alpha / 0.45) * 1.0)
+                }
+
+                ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`
+                ctx.lineWidth = lineWidth
+                ctx.beginPath()
+                ctx.moveTo(n1.x, n1.y)
+                ctx.lineTo(n2.x, n2.y)
+                ctx.stroke()
+              }
+            }
+          }
+        }
+      }
+
       nodesRef.current = nodes.map((node, idx) => {
         let vx = node.vx
         let vy = node.vy
@@ -164,11 +296,15 @@ export default function FloatingSocials() {
         let y = node.y + vy
 
         const pad = node.size / 2
-        if (x < pad) {
-          x = pad
+        // Restrict horizontal bounds to 50% left screen and 90% right screen
+        const leftBound = Math.max(pad, (1 / 11) * w)
+        const rightBound = Math.min(w - pad, (9 / 11) * w)
+
+        if (x < leftBound) {
+          x = leftBound
           vx = Math.abs(vx) * 0.8
-        } else if (x > w - pad) {
-          x = w - pad
+        } else if (x > rightBound) {
+          x = rightBound
           vx = -Math.abs(vx) * 0.8
         }
 
@@ -200,6 +336,11 @@ export default function FloatingSocials() {
       ref={containerRef}
       className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
     >
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{ zIndex: 0 }}
+      />
       {socialData.map((node, idx) => (
         <a
           key={node.name}
@@ -216,6 +357,7 @@ export default function FloatingSocials() {
             width: '80px',
             height: '80px',
             willChange: 'transform',
+            zIndex: 10,
           }}
           className="rounded-full bg-white/5 border border-white/10 hover:border-white/50 hover:bg-white hover:text-black flex items-center justify-center text-white/60 transition-colors duration-300 backdrop-blur-[2px] shadow-sm pointer-events-auto cursor-pointer"
           title={node.name}

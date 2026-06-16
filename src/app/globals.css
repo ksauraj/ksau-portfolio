@@ -48,3 +48,33 @@
   animation: glare 4s infinite ease-in-out;
   pointer-events: none;
 }
+
+@keyframes float-glow-normal {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 0.05;
+  }
+  50% {
+    transform: translate3d(10px, -20px, 0) rotate(180deg);
+    opacity: 0.15;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(360deg);
+    opacity: 0.05;
+  }
+}
+
+@keyframes float-glow-fast {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 0.05;
+  }
+  50% {
+    transform: translate3d(12px, -24px, 0) rotate(180deg);
+    opacity: 0.20;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(360deg);
+    opacity: 0.05;
+  }
+}
