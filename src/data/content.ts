@@ -26,6 +26,16 @@ export const animationConfig = {
   // Centralized duration in milliseconds for the stats counting animation.
   // Set to a lower number (e.g., 1500) to speed up, or a higher number (e.g., 2500) to slow down.
   statsDuration: 2000,
+  socials: {
+    layoutRadius: 250,           // Base radius / spacing for initial layouts
+    maxConnectionDist: 320,      // Max distance (in px) between nodes to draw connecting lines
+    maxSimultaneousGlows: 4,     // Maximum number of lines that can glow randomly at once (n/2)
+    glowSpawnProbability: 0.03,  // Probability per frame of spawning a new random line glow
+    baseLineOpacity: 0.08,       // Base opacity of the static connection lines
+    mouseSegmentThreshold: 150,  // Distance (in px) from cursor to line segment to activate it
+    mouseGlowIntensity: 0.40,    // Extra line opacity added when cursor is near
+    randomGlowIntensity: 0.45,   // Extra line opacity added during a random line glow
+  }
 }
 
 export const heroPhrases = [
