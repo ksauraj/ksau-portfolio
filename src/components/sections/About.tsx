@@ -1,14 +1,14 @@
 'use client'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import CountUp from '@/components/ui/CountUp'
-import { personalInfo, aboutContent } from '@/data/content'
+import { personalInfo, aboutContent, animationConfig } from '@/data/content'
 
 export default function About() {
   return (
     <section id="about" className="py-32 px-8 lg:px-16 border-t border-border bg-black relative z-10">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-10 gap-16 lg:gap-8">
         
-        {/* Left Side: Bio & Education (60%) */}
+        {/* Left Side: Bio (60%) */}
         <div className="lg:col-span-6 space-y-12">
           <ScrollReveal>
             <div className="inline-flex border border-border px-3 py-1.5 mb-6">
@@ -17,18 +17,6 @@ export default function About() {
             <h2 className="font-display font-medium text-white text-3xl lg:text-4xl leading-snug">
               {aboutContent.bio}
             </h2>
-          </ScrollReveal>
-
-          <ScrollReveal delay={0.1}>
-            <div className="border border-border bg-card p-6 lg:p-8">
-              <p className="font-mono text-xs text-muted tracking-widest uppercase mb-4">[ Education ]</p>
-              <h3 className="font-display font-semibold text-white text-xl">{aboutContent.education.degree}</h3>
-              <p className="font-body text-sm text-fg-dim mt-1">{aboutContent.education.major}</p>
-              <div className="flex flex-wrap justify-between items-center mt-6 pt-4 border-t border-border font-mono text-xs text-muted">
-                <span>{aboutContent.education.institution}</span>
-                <span>{aboutContent.education.period}</span>
-              </div>
-            </div>
           </ScrollReveal>
         </div>
 
@@ -54,7 +42,11 @@ export default function About() {
               <ScrollReveal key={stat.label} delay={0.2 + index * 0.05}>
                 <div className="border border-border bg-card p-6 text-center hover:border-hover transition-all duration-300">
                   <div className="font-display font-bold text-white text-4xl lg:text-5xl mb-2">
-                    <CountUp end={stat.value} suffix={stat.suffix} />
+                    <CountUp
+                      end={stat.value}
+                      suffix={stat.suffix}
+                      duration={animationConfig.statsDuration}
+                    />
                   </div>
                   <div className="font-mono text-[10px] text-muted tracking-widest uppercase">
                     {stat.label}

@@ -1,7 +1,8 @@
 'use client'
 import { motion, useScroll, useTransform } from 'framer-motion'
+import { personalInfo } from '@/data/content'
 
-const links = ['Home', '< Projects >', 'Experience', 'Skills', 'Contact']
+const links = ['Home', '< Projects >', 'Experience', 'Skills', 'Education', 'Contact']
 
 export default function Navbar() {
   const { scrollY } = useScroll()
@@ -14,8 +15,8 @@ export default function Navbar() {
       style={{ backgroundColor: bg, backdropFilter: blur }}
     >
       <div className="font-mono text-sm text-white leading-tight">
-        <div>Sauraj/&gt;</div>
-        <div>DevOps</div>
+        <div>{personalInfo.logoName}</div>
+        <div>{personalInfo.logoSub}</div>
       </div>
       <div className="hidden md:flex items-center gap-8">
         {links.map((link) => (

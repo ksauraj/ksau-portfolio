@@ -32,9 +32,9 @@ export default function Footer() {
         >
           <h2
             className="font-display font-bold text-white leading-[0.9]"
-            style={{ fontSize: 'clamp(60px, 10vw, 160px)' }}
+            style={{ fontSize: 'clamp(50px, 8vw, 120px)' }}
           >
-            Sauraj/&gt;<br />DevOps
+            {personalInfo.logoName}<br />{personalInfo.logoSub}
           </h2>
         </motion.div>
 
@@ -135,14 +135,18 @@ export default function Footer() {
 
         {/* Contact info */}
         <div className="mt-auto">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8">
             <a href={`mailto:${personalInfo.email}`}
               className="font-mono text-sm text-muted hover:text-white transition-colors">
               {personalInfo.email}
             </a>
+            <a href="/resume.pdf" download
+               className="inline-flex items-center gap-2 border border-white/20 bg-white/5 hover:bg-white hover:text-black font-mono text-xs text-white px-4 py-2 transition-all duration-300 btn-glare animate-flicker-glow">
+              <span>[ Download Resume ]</span>
+            </a>
           </div>
 
-          <div className="flex gap-6 mb-8">
+          <div className="flex flex-wrap gap-x-6 gap-y-3 mb-8">
             {personalInfo.socials.map((s) => (
               <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
                 className="font-mono text-xs text-muted hover:text-white transition-colors tracking-widest uppercase">

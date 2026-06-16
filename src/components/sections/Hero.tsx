@@ -57,7 +57,7 @@ export default function Hero() {
             {personalInfo.email}
           </a>
           <a href="/resume.pdf" download
-             className="inline-flex items-center gap-2 border border-white/20 bg-white/5 hover:bg-white hover:text-black font-mono text-xs text-white px-4 py-2 transition-all duration-300">
+             className="inline-flex items-center gap-2 border border-white/20 bg-white/5 hover:bg-white hover:text-black font-mono text-xs text-white px-4 py-2 transition-all duration-300 btn-glare animate-flicker-glow">
             <span>[ Download Resume ]</span>
           </a>
         </motion.div>
