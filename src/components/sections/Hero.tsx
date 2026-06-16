@@ -21,7 +21,7 @@ export default function Hero() {
       <FloatingDoodles count={45} />
 
       {/* Floating socials spanning the right 55% area absolutely */}
-      <div className="absolute right-0 top-0 w-[55vw] h-full pointer-events-none z-0">
+      <div className="absolute right-0 top-0 w-[55vw] h-full pointer-events-none z-20">
         <FloatingSocials />
       </div>
 
