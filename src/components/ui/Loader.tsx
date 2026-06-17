@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-export default function Loader({ onComplete }: { onComplete: () => void }) {
+export default function Loader({ onComplete }: { onComplete?: () => void }) {
   const [text, setText] = useState('loading')
   const [isFinished, setIsFinished] = useState(false)
 
@@ -36,7 +36,7 @@ export default function Loader({ onComplete }: { onComplete: () => void }) {
           setText(targetText)
           setTimeout(() => {
             setIsFinished(true)
-            setTimeout(onComplete, 800)
+            setTimeout(() => onComplete?.(), 800)
           }, 1000)
         }
       }, 50)
