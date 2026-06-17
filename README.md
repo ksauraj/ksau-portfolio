@@ -67,4 +67,22 @@ Runs the app locally at [http://localhost:3000](http://localhost:3000).
 ```bash
 npm run build
 ```
-Creates an optimized static output of your portfolio.
+Produces a static export in `out/` (HTML, CSS, JS).
+
+### Deploy to Cloudflare Pages
+
+Connect the repo in the Cloudflare Pages dashboard and use:
+
+| Setting | Value |
+| --- | --- |
+| Build command | `npm run build` |
+| Build output directory | `out` |
+| Node.js version | 20 (or latest LTS) |
+
+No Workers runtime, Wrangler, or OpenNext is required. Pages serves the `out/` directory as static files.
+
+Preview deploys can be verified with:
+
+```bash
+curl -s https://<preview-url>/ | grep -E 'Sauraj Kumar Singh|DevOps Engineer'
+```
