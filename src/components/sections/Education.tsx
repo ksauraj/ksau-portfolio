@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { motion } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import { aboutContent } from '@/data/content'
@@ -19,7 +20,11 @@ export default function Education() {
         <ScrollReveal delay={0.1}>
           <motion.div
             whileHover={{ borderColor: '#444' }}
-            className="border border-border bg-card p-8 transition-all duration-300 hover:shadow-[0_0_40px_rgba(255,255,255,0.03)]"
+            className="animate-tile-flicker border border-border bg-card p-8 transition-all duration-300 hover:shadow-[0_0_40px_rgba(255,255,255,0.03)]"
+            style={{
+              ['--flicker-dur' as string]: '9s',
+              ['--flicker-delay' as string]: '2.5s',
+            } as React.CSSProperties}
           >
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
