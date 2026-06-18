@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { motion } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import { experiences } from '@/data/content'
@@ -16,12 +17,16 @@ export default function Experience() {
           </h2>
         </ScrollReveal>
 
-        <div className="space-y-6">
+        <div className="space-y-6 tile-group">
           {experiences.map((exp, i) => (
             <ScrollReveal key={i} delay={i * 0.1}>
               <motion.div
-                whileHover={{ borderColor: '#444' }}
-                className="border border-border bg-card p-8 transition-all duration-300 hover:shadow-[0_0_40px_rgba(255,255,255,0.03)]"
+                whileHover={{ y: -4 }}
+                className="card-hover-glare animate-tile-flicker border border-border bg-card p-8 transition-shadow duration-300"
+                style={{
+                  ['--flicker-dur' as string]: `${7 + (i % 3) * 2}s`,
+                  ['--flicker-delay' as string]: `${(i * 1.7 + 0.5) % 8}s`,
+                } as React.CSSProperties}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-6">
                   <div>

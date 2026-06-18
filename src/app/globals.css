@@ -78,3 +78,66 @@
     opacity: 0.05;
   }
 }
+
+/* One-shot glare sweep on hover for project / experience cards */
+@keyframes card-glare-sweep {
+  0%   { left: -80%; opacity: 1; }
+  100% { left: 140%; opacity: 1; }
+}
+
+.card-hover-glare {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-hover-glare::after {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: -80%;
+  width: 45%;
+  height: 120%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 35%,
+    rgba(255, 255, 255, 0.07) 50%,
+    rgba(255, 255, 255, 0.03) 65%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.card-hover-glare:hover::after {
+  animation: card-glare-sweep 0.65s ease-out;
+}
+
+/* Tile border flicker for project / education cards */
+@keyframes tile-flicker {
+  0%, 18%, 20%, 60%, 62%, 64%, 100% {
+    border-color: rgba(255,255,255,0.12);
+    box-shadow: none;
+  }
+  19%, 61%, 63% {
+    border-color: rgba(255,255,255,0.55);
+    box-shadow: 0 0 18px rgba(255,255,255,0.12), inset 0 0 8px rgba(255,255,255,0.04);
+  }
+}
+
+.animate-tile-flicker {
+  animation: tile-flicker var(--flicker-dur, 7s) var(--flicker-delay, 0s) infinite;
+}
+
+/* On hover: kill flicker, hold a steady glow border */
+.animate-tile-flicker:hover {
+  animation: none;
+  border-color: rgba(255, 255, 255, 0.42) !important;
+  box-shadow: 0 0 28px rgba(255, 255, 255, 0.07), 0 0 8px rgba(255, 255, 255, 0.04), inset 0 0 12px rgba(255, 255, 255, 0.025);
+}
+
+/* Pause all sibling flickers while any card in the group is hovered */
+.tile-group:hover .animate-tile-flicker:not(:hover) {
+  animation-play-state: paused;
+}

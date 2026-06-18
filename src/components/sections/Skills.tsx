@@ -2,12 +2,14 @@
 import { motion } from 'framer-motion'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import Marquee from '@/components/ui/Marquee'
+import FloatingTechIcons from '@/components/ui/FloatingTechIcons'
 import { skills, marqueeItems } from '@/data/content'
 
 export default function Skills() {
   return (
-    <section id="skills" className="py-32 px-8 lg:px-16 border-t border-border bg-black">
-      <div className="max-w-6xl mx-auto">
+    <section id="skills" className="relative py-32 px-8 lg:px-16 border-t border-border bg-black">
+      <FloatingTechIcons />
+      <div className="relative z-10 max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="inline-flex border border-border px-3 py-1.5 mb-8">
             <span className="font-mono text-xs text-muted tracking-[0.2em] uppercase">[ Technical Skills ]</span>
@@ -31,7 +33,7 @@ export default function Skills() {
                       viewport={{ once: true }}
                       transition={{ delay: si * 0.02, duration: 0.3 }}
                       whileHover={{ borderColor: '#555', scale: 1.05 }}
-                      className="font-mono text-xs text-fg-dim border border-border bg-surface px-3 py-1.5 cursor-default select-none transition-colors duration-200"
+                      className="font-mono text-sm text-fg-dim border border-border bg-surface px-3 py-1.5 cursor-default select-none transition-colors duration-200"
                     >
                       {skill}
                     </motion.span>
