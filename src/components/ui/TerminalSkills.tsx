@@ -1129,14 +1129,22 @@ export default function TerminalSkills() {
             {mode === 'auto' ? (
               <>
                 <FillingCircle progress={agentProgress} />
-                <span style={{ color: '#444', fontSize: '11px', fontFamily: 'monospace', animation: 'fillPulse 2.2s ease-in-out infinite', whiteSpace: 'nowrap' }}>
+                <span className="hidden sm:inline" style={{ color: '#444', fontSize: '11px', fontFamily: 'monospace', animation: 'fillPulse 2.2s ease-in-out infinite', whiteSpace: 'nowrap' }}>
                   agent running · full auto · <span style={{ color: '#777' }}>switch to manual for control</span>
+                </span>
+                <span className="inline sm:hidden" style={{ color: '#444', fontSize: '11px', fontFamily: 'monospace', animation: 'fillPulse 2.2s ease-in-out infinite', whiteSpace: 'nowrap' }}>
+                  agent running
                 </span>
               </>
             ) : (
               <>
                 <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#333', display: 'inline-block', flexShrink: 0 }} />
-                <span style={{ color: '#444', fontSize: '11px', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>manual mode · type a command above</span>
+                <span className="hidden sm:inline" style={{ color: '#444', fontSize: '11px', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
+                  manual mode · type a command above
+                </span>
+                <span className="inline sm:hidden" style={{ color: '#444', fontSize: '11px', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
+                  manual mode
+                </span>
               </>
             )}
           </div>

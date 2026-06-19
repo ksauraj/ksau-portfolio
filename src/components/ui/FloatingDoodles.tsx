@@ -71,7 +71,7 @@ function FloatingDoodlesComponent({ count = 18, isFastGlow = false }: { count?: 
   const animationName = isFastGlow ? 'float-glow-fast' : 'float-glow-normal'
 
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+    <div className="hidden md:block absolute inset-0 overflow-hidden pointer-events-none z-0">
       {items.map((item) => (
         <div
           key={item.id}
