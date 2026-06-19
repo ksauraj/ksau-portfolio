@@ -384,7 +384,7 @@ export default function FloatingSocials() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
+      className="hidden md:block absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
     >
       <canvas
         ref={canvasRef}

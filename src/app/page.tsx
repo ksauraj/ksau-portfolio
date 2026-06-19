@@ -8,6 +8,7 @@ import OpenSource from '@/components/sections/OpenSource'
 import Education from '@/components/sections/Education'
 import Footer from '@/components/sections/Footer'
 import Loader from '@/components/ui/Loader'
+import ResponsiveNotice from '@/components/ui/ResponsiveNotice'
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
       <Loader />
       <main className="relative min-h-screen bg-black text-white">
         <Navbar />
+        <ResponsiveNotice />
         <Hero />
         <About />
         <Skills />
