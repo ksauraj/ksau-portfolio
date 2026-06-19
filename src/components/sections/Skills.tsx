@@ -1,51 +1,62 @@
 'use client'
-import { motion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import Marquee from '@/components/ui/Marquee'
 import FloatingTechIcons from '@/components/ui/FloatingTechIcons'
-import { skills, marqueeItems } from '@/data/content'
+import TerminalSkills from '@/components/ui/TerminalSkills'
+import { marqueeItems } from '@/data/content'
 
 export default function Skills() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const terminalRef = useRef<HTMLDivElement>(null)
+  const [terminalRect, setTerminalRect] = useState<{ left: number; top: number; right: number; bottom: number } | null>(null)
+
+  useEffect(() => {
+    const measure = () => {
+      if (!sectionRef.current || !terminalRef.current) return
+      const sectionRect = sectionRef.current.getBoundingClientRect()
+      const tRect = terminalRef.current.getBoundingClientRect()
+      setTerminalRect({
+        left: tRect.left - sectionRect.left,
+        top: tRect.top - sectionRect.top,
+        right: tRect.right - sectionRect.left,
+        bottom: tRect.bottom - sectionRect.top
+      })
+    }
+
+    measure()
+    const ro = new ResizeObserver(measure)
+    if (terminalRef.current) ro.observe(terminalRef.current)
+    if (sectionRef.current) ro.observe(sectionRef.current)
+    return () => ro.disconnect()
+  }, [])
+
   return (
-    <section id="skills" className="relative py-32 px-8 lg:px-16 border-t border-border bg-black">
-      <FloatingTechIcons />
+    <section ref={sectionRef} id="skills" className="relative py-20 px-8 lg:px-16 border-t border-border bg-black">
+      <div className="opacity-40">
+        <FloatingTechIcons terminalRect={terminalRect} />
+      </div>
+
       <div className="relative z-10 max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="inline-flex border border-border px-3 py-1.5 mb-8">
             <span className="font-mono text-xs text-muted tracking-[0.2em] uppercase">[ Technical Skills ]</span>
           </div>
-          <h2 className="font-display font-semibold text-white text-5xl lg:text-6xl leading-tight mb-16">
-            Tools I use to build<br />things that don&apos;t break.
+          <h2 className="font-display font-semibold text-white text-3xl lg:text-4xl leading-tight mb-10">
+            Stack. Ship. Scale.
           </h2>
         </ScrollReveal>
 
-        <div className="space-y-10 mb-20">
-          {Object.entries(skills).map(([category, items], ci) => (
-            <ScrollReveal key={category} delay={ci * 0.05}>
-              <div>
-                <p className="font-mono text-xs text-muted tracking-widest uppercase mb-4">{category}</p>
-                <div className="flex flex-wrap gap-2">
-                  {items.map((skill, si) => (
-                    <motion.span
-                      key={skill}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: si * 0.02, duration: 0.3 }}
-                      whileHover={{ borderColor: '#555', scale: 1.05 }}
-                      className="font-mono text-sm text-fg-dim border border-border bg-surface px-3 py-1.5 cursor-default select-none transition-colors duration-200"
-                    >
-                      {skill}
-                    </motion.span>
-                  ))}
-                </div>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
+        <ScrollReveal delay={0.1}>
+          <div ref={terminalRef}>
+            <TerminalSkills />
+          </div>
+        </ScrollReveal>
       </div>
 
-      <Marquee items={marqueeItems} />
+      <div className="relative z-10 mt-20">
+        <Marquee items={marqueeItems} />
+      </div>
     </section>
   )
 }

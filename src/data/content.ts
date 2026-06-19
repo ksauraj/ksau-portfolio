@@ -48,7 +48,7 @@ export const heroPhrases = [
 ]
 
 export const aboutContent = {
-  bio: "I'm a DevOps Engineer & Open Source contributor based in Noida, India. I specialize in building highly scalable, reliable, and secure cloud infrastructure. Focusing on automation, CI/CD performance, and observability, I design systems that handle massive traffic and never break.",
+  bio: "I build pipelines so your load never bursts. Self-healing clusters, zero-downtime deploys, CI/CD that ships while you sleep — and monitoring stacks that catch fires before your users ever notice. Open source contributor by habit, automation-first by nature.",
   education: {
     degree: 'Bachelor of Technology (B.Tech.)',
     major: 'Information Technology',
@@ -64,15 +64,15 @@ export const aboutContent = {
 }
 
 export const skills = {
-  'Languages': ['Go', 'Python', 'Bash', 'C', 'JavaScript', 'HTML/CSS', 'YAML', 'SQL'],
-  'DevOps & Automation': ['Docker', 'Kubernetes', 'Helm', 'GitHub Actions', 'GitLab CI', 'Ansible', 'Terraform', 'Makefile', 'Docker Compose', 'CI/CD Pipelines', 'Infrastructure as Code (IaC)'],
-  'Cloud & Platforms': ['AWS (EC2, S3, IAM, ECS, Fargate, VPC, ALB, Auto Scaling, CloudFront, CloudWatch)', 'Azure (VNet, VMSS, Application Gateway)', 'GCP', 'Oracle Cloud', 'Linode', 'Microsoft Graph API'],
+  'Languages': ['Go', 'Python', 'Bash', 'C', 'JavaScript', 'HTML', 'YAML', 'SQL'],
+  'DevOps & Automation': ['Docker', 'Kubernetes', 'Helm', 'GitHub Actions', 'GitLab CI', 'Ansible', 'Terraform', 'Docker Compose', 'CI/CD Pipelines', 'IaC', 'Makefile'],
+  'Cloud & Platforms': ['AWS', 'Azure', 'GCP', 'Oracle Cloud', 'Linode', 'Microsoft Graph API'],
   'Observability & Monitoring': ['Prometheus', 'Grafana', 'Loki', 'Promtail', 'Node Exporter', 'cAdvisor', 'Wazuh', 'Log Aggregation', 'Alerting'],
-  'Networking': ['TCP/IP', 'DNS', 'HTTP/HTTPS', 'TLS/SSL', 'Load Balancing', 'Reverse Proxies', 'Routing', 'Subnetting', 'VPN', 'API Gateways', 'Network Troubleshooting'],
-  'Security & DevSecOps': ['HashiCorp Vault', 'SBOM Generation', 'Container Security', 'Secret Management', 'Vulnerability Scanning', 'Security Automation', 'PCI DSS Fundamentals', 'DDoS Detection', 'Access Control'],
+  'Networking': ['TCP/IP', 'DNS', 'HTTP/HTTPS', 'TLS/SSL', 'Load Balancing', 'Reverse Proxies', 'Routing', 'Subnetting', 'VPN', 'API Gateways'],
+  'Security & DevSecOps': ['HashiCorp Vault', 'Container Security', 'Secret Management', 'SBOM Generation', 'Vulnerability Scanning', 'Security Automation', 'PCI DSS', 'DDoS Detection', 'Access Control'],
   'Databases': ['MySQL', 'Database Design', 'Query Optimization'],
   'Linux & Systems': ['Linux', 'Systemd', 'Shell Scripting', 'Tmux', 'Vim', 'Process Management', 'Server Administration'],
-  'Tools & Technologies': ['Git', 'REST APIs', 'Webhooks', 'Kong API Gateway', 'Nginx', 'Caddy', 'Railway', 'Heroku', 'Cirrus CI', 'Android Build System', 'Android Firmware Development']
+  'Tools & Technologies': ['Git', 'Nginx', 'Caddy', 'Heroku', 'Railway', 'Kong API Gateway', 'REST APIs', 'Webhooks', 'Cirrus CI', 'Android Build System']
 }
 
 export const marqueeItems = [
