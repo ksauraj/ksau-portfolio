@@ -48,7 +48,7 @@ export const heroPhrases = [
 ]
 
 export const aboutContent = {
-  bio: "I build pipelines so your load never bursts. Self-healing clusters, zero-downtime deploys, CI/CD that ships while you sleep — and monitoring stacks that catch fires before your users ever notice. Open source contributor by habit, automation-first by nature.",
+  bio: "Most of my job is making sure nothing interesting happens at 3 AM. Self-healing clusters, deploys that don't need a prayer, CI/CD pipelines that ship while I'm asleep. I write monitoring so good it catches fires before your users even smell smoke. Open source contributor, professional automator of things that shouldn't need a human.",
   education: {
     degree: 'Bachelor of Technology (B.Tech.)',
     major: 'Information Technology',
