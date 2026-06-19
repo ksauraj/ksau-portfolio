@@ -42,12 +42,15 @@ export default function Skills() {
           <div className="inline-flex border border-border px-3 py-1.5 mb-8">
             <span className="font-mono text-xs text-muted tracking-[0.2em] uppercase">[ Technical Skills ]</span>
           </div>
-          <h2 className="font-display font-semibold text-white text-3xl lg:text-4xl leading-tight mb-10">
-            Stack. Ship. Scale.
+          <h2 className="font-display font-semibold text-white text-3xl lg:text-4xl leading-tight mb-14">
+            Ask my terminal, not my resume.
           </h2>
         </ScrollReveal>
 
         <ScrollReveal delay={0.1}>
+          <div className="font-mono text-xs text-white/40 mb-3 text-left">
+            {"This isn't a demo — it's running live. Switch to manual mode from bottom-right corner, and type a command if you want."}
+          </div>
           <div ref={terminalRef}>
             <TerminalSkills />
           </div>
