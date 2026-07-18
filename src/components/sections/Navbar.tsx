@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { personalInfo } from '@/data/content'
 
-const links = ['Home', 'Projects', 'Experience', 'Skills', 'Education']
+const links = ['Home', 'Skills', 'Experience', 'Projects', 'Education']
 const sectionId = (link: string) => link.replace(/[^a-z]/gi, '').toLowerCase()
 
 export default function Navbar() {
