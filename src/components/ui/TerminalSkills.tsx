@@ -308,8 +308,54 @@ const CATS: Record<string, Category> = {
   ]},
 }
 
-const ALL_COMMANDS = ['ls', 'whoami', 'clear', 'help', 'pwd', 'sudo', 'vim', 'cd', 'rm', 'cat']
+const ALL_COMMANDS = ['ls', 'cd', 'cat', 'grep', 'tree', 'neofetch', 'whoami', 'pwd', 'clear', 'help', 'sudo', 'vim', 'rm']
 const ALL_CATS = Object.keys(CATS)
+const ALL_SKILLS: { skill: Skill; catKey: string }[] =
+  ALL_CATS.flatMap(catKey => CATS[catKey].skills.map(skill => ({ skill, catKey })))
+
+// ─── Skill metadata (auto-generated, deterministic) ───────────────────────────
+// One-line noun per category, used to template the cat spec-sheet blurb.
+const CAT_NOUN: Record<string, string> = {
+  languages:  'programming language',
+  devops:     'delivery & automation tool',
+  cloud:      'cloud platform / service',
+  monitoring: 'observability component',
+  networking: 'networking primitive',
+  security:   'security control',
+  databases:  'data-layer capability',
+  linux:      'systems / linux skill',
+  tools:      'engineering tool',
+}
+
+// Stable hash so proficiency never flickers across re-renders.
+function hashStr(s: string): number {
+  let h = 2166136261
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) }
+  return h >>> 0
+}
+// Deterministic proficiency in the 62–96 range (portfolio skews strong).
+function profOf(name: string): number { return 62 + (hashStr(name) % 35) }
+function profLabel(p: number): string { return p >= 85 ? 'advanced' : p >= 72 ? 'proficient' : 'working' }
+function profBar(p: number, seg = 12): string {
+  const filled = Math.round((p / 100) * seg)
+  return '█'.repeat(filled) + '░'.repeat(seg - filled)
+}
+
+function findSkill(arg: string): { skill: Skill; catKey: string } | null {
+  const q = arg.trim().toLowerCase().replace(/\/+$/, '')
+  if (!q) return null
+  const norm = (s: string) => s.toLowerCase().replace(/[\s/._-]+/g, '')
+  return (
+    ALL_SKILLS.find(({ skill }) => skill.name.toLowerCase() === q) ??
+    ALL_SKILLS.find(({ skill }) => norm(skill.name) === norm(q)) ??
+    ALL_SKILLS.find(({ skill }) => norm(skill.name).startsWith(norm(q))) ??
+    null
+  )
+}
+
+// ─── cwd helpers ──────────────────────────────────────────────────────────────
+function pathLabel(cwd: string | null): string { return cwd ? `~/${cwd}` : '~' }
+function pwdPath(cwd: string | null): string { return `/home/sauraj/skills${cwd ? '/' + cwd : ''}` }
 
 // ─── Agent narrative pools ────────────────────────────────────────────────────
 const TASK_INIT = [
@@ -397,56 +443,146 @@ const PWD_THINK = [
 
 // ─── Line Types ───────────────────────────────────────────────────────────────
 type Line =
-  | { type: 'prompt'; cmd: string }
+  | { type: 'prompt'; cmd: string; cwd?: string | null }
   | { type: 'text'; text: string; dim?: boolean }
   | { type: 'agent'; text: string }
   | { type: 'ls-header' }
   | { type: 'ls-grid' }
   | { type: 'cat-header'; key: string }
   | { type: 'cat-grid'; key: string }
+  | { type: 'ls-long'; key: string }
+  | { type: 'spec'; name: string }
+  | { type: 'tree' }
+  | { type: 'neofetch' }
+  | { type: 'grep'; query: string }
   | { type: 'spacer' }
 
 // ─── Command Handler ──────────────────────────────────────────────────────────
-function runCommand(raw: string): Line[] {
+interface CmdResult { lines: Line[]; newCwd?: string | null }
+
+function runCommand(raw: string, cwd: string | null = null): CmdResult {
   const trimmed = raw.trim()
   const parts = trimmed.split(/\s+/)
   const cmd = parts[0]?.toLowerCase() ?? ''
-  const arg = parts.slice(1).join(' ').toLowerCase()
-  if (!cmd) return []
+  const rest = parts.slice(1)
+  const flags = rest.filter(p => p.startsWith('-')).map(p => p.toLowerCase())
+  const args = rest.filter(p => !p.startsWith('-'))
+  const arg = args.join(' ').toLowerCase()
+  if (!cmd) return { lines: [] }
 
-  if (cmd === 'clear') return [{ type: 'prompt', cmd: 'clear' }]
-  const out: Line[] = [{ type: 'prompt', cmd: trimmed }]
+  if (cmd === 'clear') return { lines: [{ type: 'prompt', cmd: 'clear', cwd }] }
+  const out: Line[] = [{ type: 'prompt', cmd: trimmed, cwd }]
+  const done = (newCwd?: string | null): CmdResult =>
+    newCwd === undefined ? { lines: out } : { lines: out, newCwd }
 
-  if (cmd === 'ls' && !arg) {
-    out.push({ type: 'ls-header' })
-    out.push({ type: 'ls-grid' })
+  // ── cd ──────────────────────────────────────────────────────────────────────
+  if (cmd === 'cd') {
+    const target = args[0]?.toLowerCase().replace(/\/+$/, '')
+    if (!target || target === '~' || target === '/' || target === '..') {
+      out.push({ type: 'spacer' })
+      return done(null)
+    }
+    if (target === '.') { out.push({ type: 'spacer' }); return done(cwd) }
+    const key = ALL_CATS.find(k => k === target || k.startsWith(target))
+    if (!key) {
+      out.push({ type: 'text', text: `cd: ${target}: no such directory - try ls`, dim: true })
+      out.push({ type: 'spacer' })
+      return done()
+    }
     out.push({ type: 'spacer' })
-    return out
+    return done(key)
   }
 
-  if (cmd === 'ls' && arg) {
-    const key = ALL_CATS.find(k => k === arg || k.startsWith(arg))
+  // ── ls ──────────────────────────────────────────────────────────────────────
+  if (cmd === 'ls') {
+    const long = flags.includes('-l') || flags.includes('-la') || flags.includes('-al')
+    const target = (arg || cwd || '').replace(/\/+$/, '')
+    // Root listing (no target): show categories
+    if (!target) {
+      out.push({ type: 'ls-header' })
+      out.push({ type: 'ls-grid' })
+      out.push({ type: 'spacer' })
+      return done()
+    }
+    const key = ALL_CATS.find(k => k === target || k.startsWith(target))
     if (!key) {
-      out.push({ type: 'text', text: `ls: ${arg}: no such category - try ls`, dim: true })
+      out.push({ type: 'text', text: `ls: ${target}: no such category - try ls`, dim: true })
+    } else if (long) {
+      out.push({ type: 'cat-header', key })
+      out.push({ type: 'ls-long', key })
     } else {
       out.push({ type: 'cat-header', key })
       out.push({ type: 'cat-grid', key })
     }
     out.push({ type: 'spacer' })
-    return out
+    return done()
+  }
+
+  // ── cat ─────────────────────────────────────────────────────────────────────
+  if (cmd === 'cat') {
+    if (!arg) {
+      out.push({ type: 'text', text: 'usage: cat <skill>   (try: cat docker)', dim: true })
+      out.push({ type: 'spacer' })
+      return done()
+    }
+    if (arg.includes('resume')) {
+      out.push({ type: 'text', text: 'opening resume.pdf...' })
+      out.push({ type: 'spacer' })
+      return done()
+    }
+    const found = findSkill(arg)
+    if (!found) {
+      out.push({ type: 'text', text: `cat: ${arg}: no such skill - try grep ${arg.split(' ')[0]}`, dim: true })
+      out.push({ type: 'spacer' })
+      return done()
+    }
+    out.push({ type: 'spec', name: found.skill.name })
+    out.push({ type: 'spacer' })
+    return done()
+  }
+
+  // ── grep ────────────────────────────────────────────────────────────────────
+  if (cmd === 'grep') {
+    if (!arg) {
+      out.push({ type: 'text', text: 'usage: grep <query>   (searches skill names)', dim: true })
+      out.push({ type: 'spacer' })
+      return done()
+    }
+    out.push({ type: 'grep', query: arg })
+    out.push({ type: 'spacer' })
+    return done()
+  }
+
+  // ── tree ────────────────────────────────────────────────────────────────────
+  if (cmd === 'tree') {
+    out.push({ type: 'tree' })
+    out.push({ type: 'spacer' })
+    return done()
+  }
+
+  // ── neofetch ──────────────────────────────────────────────────────────────
+  if (cmd === 'neofetch') {
+    out.push({ type: 'neofetch' })
+    out.push({ type: 'spacer' })
+    return done()
   }
 
   if (cmd === 'help') {
     out.push({ type: 'text', text: 'available commands:', dim: true })
-    out.push({ type: 'text', text: '  ls              list all skill categories' })
-    out.push({ type: 'text', text: '  ls <category>   show skills in a category' })
-    out.push({ type: 'text', text: '  whoami          about me' })
-    out.push({ type: 'text', text: '  clear           clear terminal' })
-    out.push({ type: 'text', text: '  pwd             current path' })
+    out.push({ type: 'text', text: '  ls [category]     list categories, or skills in one' })
+    out.push({ type: 'text', text: '  ls -l <category>  long list with proficiency bars' })
+    out.push({ type: 'text', text: '  cd <category>     enter a category  (cd .. to go back)' })
+    out.push({ type: 'text', text: '  cat <skill>       show a skill spec sheet' })
+    out.push({ type: 'text', text: '  grep <query>      search skills across categories' })
+    out.push({ type: 'text', text: '  tree              print the full skill tree' })
+    out.push({ type: 'text', text: '  neofetch          system / about card' })
+    out.push({ type: 'text', text: '  whoami            about me' })
+    out.push({ type: 'text', text: '  pwd               current path' })
+    out.push({ type: 'text', text: '  clear             clear terminal' })
     out.push({ type: 'text', text: '' })
     out.push({ type: 'text', text: 'categories: ' + ALL_CATS.join('  '), dim: true })
     out.push({ type: 'spacer' })
-    return out
+    return done()
   }
 
   if (cmd === 'whoami') {
@@ -455,44 +591,39 @@ function runCommand(raw: string): Line[] {
     out.push({ type: 'text', text: 'self-healing clusters, zero-downtime deploys,' })
     out.push({ type: 'text', text: 'ci/cd that ships while you sleep.' })
     out.push({ type: 'spacer' })
-    return out
+    return done()
   }
 
   if (cmd === 'pwd') {
-    out.push({ type: 'text', text: '/home/sauraj/skills' })
+    out.push({ type: 'text', text: pwdPath(cwd) })
     out.push({ type: 'spacer' })
-    return out
+    return done()
   }
 
   if (cmd === 'sudo') {
     out.push({ type: 'text', text: 'nice try. no root for visitors.', dim: true })
     out.push({ type: 'spacer' })
-    return out
+    return done()
   }
   if (cmd === 'vim') {
     out.push({ type: 'text', text: "you can't exit. you know this.", dim: true })
     out.push({ type: 'spacer' })
-    return out
-  }
-  if (cmd === 'cd') {
-    out.push({ type: 'text', text: "permission denied: you're already at root.", dim: true })
-    out.push({ type: 'spacer' })
-    return out
+    return done()
   }
   if (trimmed === 'rm -rf /') {
     out.push({ type: 'text', text: 'lol. nice try. system intact.', dim: true })
     out.push({ type: 'spacer' })
-    return out
+    return done()
   }
-  if (cmd === 'cat' && arg.includes('resume')) {
-    out.push({ type: 'text', text: 'opening resume.pdf...' })
+  if (cmd === 'rm') {
+    out.push({ type: 'text', text: 'rm: operation not permitted (read-only visitor session).', dim: true })
     out.push({ type: 'spacer' })
-    return out
+    return done()
   }
 
   out.push({ type: 'text', text: `command not found: ${cmd} - try help`, dim: true })
   out.push({ type: 'spacer' })
-  return out
+  return done()
 }
 
 // ─── Sub-renders ──────────────────────────────────────────────────────────────
@@ -570,6 +701,147 @@ function CatGrid({ catKey }: { catKey: string }) {
           ))}
         </div>
       ))}
+    </div>
+  )
+}
+
+// ─── ls -l : long listing with proficiency meters ─────────────────────────────
+function LsLong({ catKey }: { catKey: string }) {
+  const cat = CATS[catKey]
+  return (
+    <div style={{ fontFamily: 'monospace', fontSize: FSS }}>
+      {cat.skills.map(skill => {
+        const p = profOf(skill.name)
+        return (
+          <div key={skill.name} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '2px 0', color: '#888' }}>
+            <span style={{ color: '#333', width: '48px', flexShrink: 0 }}>-rwx</span>
+            <span style={{ color: '#555', width: '84px', flexShrink: 0 }}>{profLabel(p)}</span>
+            <span style={{ color: '#666', letterSpacing: '-1px', flexShrink: 0 }}>[{profBar(p, 10)}]</span>
+            <span style={{ color: '#aaa' }}>{skill.name}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// ─── cat : skill spec sheet (man-page style) ──────────────────────────────────
+function SpecSheet({ name }: { name: string }) {
+  const found = findSkill(name)
+  if (!found) return null
+  const { skill, catKey } = found
+  const p = profOf(skill.name)
+  const siblings = CATS[catKey].skills.filter(s => s.name !== skill.name).slice(0, 4).map(s => s.name)
+  const row = (label: string, children: React.ReactNode) => (
+    <div style={{ display: 'flex', gap: '10px', padding: '1px 0' }}>
+      <span style={{ color: '#333', width: '82px', flexShrink: 0, textTransform: 'uppercase', fontSize: '11px', letterSpacing: '0.06em' }}>{label}</span>
+      <span style={{ color: '#999' }}>{children}</span>
+    </div>
+  )
+  return (
+    <div style={{ fontFamily: 'monospace', fontSize: FSS, border: '1px solid #151515', borderRadius: '4px', padding: '10px 12px', margin: '2px 0', background: '#050505' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666', borderBottom: '1px solid #111', paddingBottom: '6px', marginBottom: '8px' }}>
+        <i className={skill.icon} style={{ fontSize: '15px', color: '#888', filter: skill.icon.startsWith('devicon') ? 'grayscale(1) brightness(0.9)' : 'none' }} />
+        <span style={{ color: '#aaa' }}>{skill.name}</span>
+        <span style={{ color: '#2a2a2a', marginLeft: 'auto', fontSize: '11px' }}>SKILL(1)</span>
+      </div>
+      {row('name', <>{skill.name.toLowerCase()} — {CAT_NOUN[catKey]}</>)}
+      {row('category', <span style={{ color: '#777' }}>{catKey}/</span>)}
+      {row('proficiency',
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ color: '#666', letterSpacing: '-1px' }}>[{profBar(p)}]</span>
+          <span style={{ color: '#888' }}>{profLabel(p)}</span>
+        </span>
+      )}
+      {siblings.length > 0 && row('see also', <span style={{ color: '#555' }}>{siblings.join(', ')}</span>)}
+    </div>
+  )
+}
+
+// ─── tree : full hierarchy ────────────────────────────────────────────────────
+function TreeView() {
+  let total = 0
+  return (
+    <div style={{ fontFamily: 'monospace', fontSize: FSS, color: '#888', lineHeight: '1.5' }}>
+      <div style={{ color: '#aaa' }}>~/skills</div>
+      {ALL_CATS.map((k, ci) => {
+        const cat = CATS[k]; total += cat.skills.length
+        const lastCat = ci === ALL_CATS.length - 1
+        return (
+          <div key={k}>
+            <div style={{ color: '#999' }}>
+              <span style={{ color: '#333' }}>{lastCat ? '└── ' : '├── '}</span>{cat.label}/ <span style={{ color: '#444' }}>({cat.skills.length})</span>
+            </div>
+            {cat.skills.map((s, si) => (
+              <div key={s.name} style={{ color: '#666' }}>
+                <span style={{ color: '#222' }}>{lastCat ? '    ' : '│   '}{si === cat.skills.length - 1 ? '└── ' : '├── '}</span>{s.name}
+              </div>
+            ))}
+          </div>
+        )
+      })}
+      <div style={{ color: '#333', marginTop: '4px' }}>{ALL_CATS.length} categories, {total} skills</div>
+    </div>
+  )
+}
+
+// ─── grep : cross-category search ─────────────────────────────────────────────
+function GrepView({ query }: { query: string }) {
+  const q = query.toLowerCase()
+  const hits = ALL_SKILLS.filter(({ skill, catKey }) =>
+    skill.name.toLowerCase().includes(q) || catKey.includes(q))
+  if (hits.length === 0) {
+    return <div style={{ fontFamily: 'monospace', fontSize: FSS, color: '#3a3a3a' }}>grep: no match for &quot;{query}&quot;</div>
+  }
+  return (
+    <div style={{ fontFamily: 'monospace', fontSize: FSS }}>
+      {hits.map(({ skill, catKey }) => {
+        const idx = skill.name.toLowerCase().indexOf(q)
+        return (
+          <div key={catKey + skill.name} style={{ display: 'flex', gap: '10px', padding: '1px 0', color: '#777' }}>
+            <span style={{ color: '#444', width: '96px', flexShrink: 0 }}>{catKey}/</span>
+            <span style={{ color: '#999' }}>
+              {idx < 0 ? skill.name : <>{skill.name.slice(0, idx)}<span style={{ color: '#fff', background: '#1a1a1a' }}>{skill.name.slice(idx, idx + q.length)}</span>{skill.name.slice(idx + q.length)}</>}
+            </span>
+          </div>
+        )
+      })}
+      <div style={{ color: '#333', marginTop: '4px' }}>{hits.length} match{hits.length === 1 ? '' : 'es'}</div>
+    </div>
+  )
+}
+
+// ─── neofetch : about card ────────────────────────────────────────────────────
+function NeofetchView() {
+  const totalSkills = ALL_SKILLS.length
+  const logo = ['   ▄▄▄▄▄   ', '  █     █  ', '  █ ▄ ▄ █  ', '  █  ▀  █  ', '  █▄▄▄▄▄█  ', '   ▀▀▀▀▀   ']
+  const info: [string, string][] = [
+    ['role', 'DevOps Engineer'],
+    ['uptime', 'always shipping'],
+    ['shell', 'skills.sh v1.0'],
+    ['stack', 'Go · K8s · AWS · Linux'],
+    ['domains', `${ALL_CATS.length} categories`],
+    ['skills', `${totalSkills} tracked`],
+    ['contact', 'cat resume  ·  ls tools'],
+  ]
+  return (
+    <div style={{ display: 'flex', gap: '16px', fontFamily: 'monospace', fontSize: FSS, padding: '2px 0' }}>
+      <div style={{ color: '#555', whiteSpace: 'pre', flexShrink: 0 }}>{logo.join('\n')}</div>
+      <div>
+        <div style={{ color: '#aaa' }}>sauraj@portfolio</div>
+        <div style={{ color: '#222' }}>{'─'.repeat(18)}</div>
+        {info.map(([k, v]) => (
+          <div key={k} style={{ padding: '1px 0' }}>
+            <span style={{ color: '#555', display: 'inline-block', width: '72px' }}>{k}</span>
+            <span style={{ color: '#999' }}>{v}</span>
+          </div>
+        ))}
+        <div style={{ display: 'flex', gap: '3px', marginTop: '6px' }}>
+          {['#111', '#333', '#555', '#777', '#999', '#bbb', '#ddd', '#fff'].map(c => (
+            <span key={c} style={{ width: '12px', height: '12px', background: c, display: 'inline-block' }} />
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
@@ -721,7 +993,7 @@ function useAutoMode(
 
         // 4. Append results
         const result = runCommand(cmd)
-        const withoutPrompt = result.filter(l => l.type !== 'prompt')
+        const withoutPrompt = result.lines.filter(l => l.type !== 'prompt')
         const tokensUsed = rand(1200, 5800)
         const ctxPct = rand(8, 22)
 
@@ -858,6 +1130,7 @@ export default function TerminalSkills() {
   const [thinkText, setThinkText] = useState('')      // thinking narration being typed
   const [agentProgress, setAgentProgress] = useState(0)
   const [input, setInput] = useState('')
+  const [cwd, setCwd] = useState<string | null>(null)   // manual-mode working directory (category key or root)
   const [history, setHistory] = useState<string[]>([])
   const [historyIdx, setHistoryIdx] = useState(-1)
   const [booted, setBooted] = useState(false)
@@ -953,8 +1226,8 @@ export default function TerminalSkills() {
 
   useEffect(() => {
     if (mode === 'manual' && booted) {
-      setTypingText(''); setThinkText(''); setActiveCategory(null)
-      const lsLines = runCommand('ls')
+      setTypingText(''); setThinkText(''); setActiveCategory(null); setCwd(null)
+      const lsLines = runCommand('ls').lines
       setLines(prev => prev.some(l => l.type === 'prompt') ? prev : [...prev, ...lsLines])
       setTimeout(scrollToBottom, 50)
     }
@@ -977,20 +1250,32 @@ export default function TerminalSkills() {
     if (trimmed.toLowerCase().startsWith('cat') && trimmed.toLowerCase().includes('resume')) {
       const a = document.createElement('a'); a.href = '/resume.pdf'; a.download = 'resume.pdf'; a.click()
     }
-    appendLines(runCommand(trimmed))
-  }, [appendLines])
+    const result = runCommand(trimmed, cwd)
+    if (result.newCwd !== undefined) setCwd(result.newCwd)
+    appendLines(result.lines)
+  }, [appendLines, cwd])
 
   const handleKey = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') { submit(input); return }
     if (e.key === 'Tab') {
       e.preventDefault()
-      const val = input.trim()
-      if (val.startsWith('ls ')) {
-        const match = ALL_CATS.find(c => c.startsWith(val.slice(3)))
-        if (match) setInput('ls ' + match)
-      } else {
-        const match = ALL_COMMANDS.find(c => c.startsWith(val) && c !== val)
-        if (match) setInput(match)
+      const val = input.replace(/^\s+/, '')
+      const sp = val.indexOf(' ')
+      if (sp === -1) {
+        // completing the command word
+        const match = ALL_COMMANDS.find(c => c.startsWith(val.toLowerCase()) && c !== val.toLowerCase())
+        if (match) setInput(match + ' ')
+        return
+      }
+      const head = val.slice(0, sp).toLowerCase()
+      const partial = val.slice(sp + 1).trimStart().toLowerCase()
+      if (head === 'ls' || head === 'cd') {
+        const match = ALL_CATS.find(c => c.startsWith(partial))
+        if (match) setInput(`${head} ${match}`)
+      } else if (head === 'cat' || head === 'grep') {
+        const norm = (s: string) => s.toLowerCase().replace(/[\s/._-]+/g, '')
+        const hit = ALL_SKILLS.find(({ skill }) => norm(skill.name).startsWith(norm(partial)))
+        if (hit) setInput(`${head} ${hit.skill.name}`)
       }
       return
     }
@@ -1004,7 +1289,7 @@ export default function TerminalSkills() {
       case 'prompt':
         return (
           <div id={id} key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px', fontFamily: 'monospace', fontSize: FS }}>
-            <span style={{ color: '#555' }}>visitor@portfolio:~$</span>
+            <span style={{ color: '#555' }}>visitor@portfolio:{pathLabel(line.cwd ?? null)}$</span>
             <span style={{ color: '#fff' }}>{line.cmd}</span>
           </div>
         )
@@ -1021,6 +1306,11 @@ export default function TerminalSkills() {
       case 'ls-grid': return <div id={id} key={i}><LsGrid /></div>
       case 'cat-header': return <div id={id} key={i}><CatHeader catKey={line.key} /></div>
       case 'cat-grid': return <div id={id} key={i}><CatGrid catKey={line.key} /></div>
+      case 'ls-long': return <div id={id} key={i}><LsLong catKey={line.key} /></div>
+      case 'spec': return <div id={id} key={i}><SpecSheet name={line.name} /></div>
+      case 'tree': return <div id={id} key={i}><TreeView /></div>
+      case 'neofetch': return <div id={id} key={i}><NeofetchView /></div>
+      case 'grep': return <div id={id} key={i}><GrepView query={line.query} /></div>
       default: return null
     }
   }
@@ -1095,13 +1385,13 @@ export default function TerminalSkills() {
             {/* Manual input */}
             {mode === 'manual' && (
               <div style={{ borderTop: '1px solid #151515', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: '#555', fontSize: FS, fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>visitor@portfolio:~$</span>
+                <span style={{ color: '#555', fontSize: FS, fontFamily: 'monospace', whiteSpace: 'nowrap', flexShrink: 0 }}>visitor@portfolio:{pathLabel(cwd)}$</span>
                 <input
                   ref={inputRef} aria-label="Terminal input" value={input}
                   onChange={e => setInput(e.target.value)} onKeyDown={handleKey}
                   spellCheck={false} autoCapitalize="off" autoCorrect="off" autoFocus
                   style={{ background: 'transparent', border: 'none', outline: 'none', color: '#fff', fontSize: FS, fontFamily: 'monospace', width: '100%', caretColor: '#fff' }}
-                  placeholder="try: ls  or  ls devops"
+                  placeholder="try: cd devops · cat docker · grep proxy · tree · neofetch"
                 />
               </div>
             )}
