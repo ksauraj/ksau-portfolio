@@ -6,7 +6,7 @@ import { openSource } from '@/data/content'
 
 export default function OpenSource() {
   return (
-    <section id="opensource" className="py-32 px-8 lg:px-16 border-t border-border bg-black">
+    <section id="opensource" aria-label="Open Source Contributions" className="py-32 px-8 lg:px-16 border-t border-border bg-black">
       <div className="max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="inline-flex border border-border px-3 py-1.5 mb-8">

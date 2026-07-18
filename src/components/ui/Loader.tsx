@@ -55,7 +55,7 @@ export default function Loader({ onComplete }: { onComplete?: () => void }) {
           initial={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
           exit={{ opacity: 0, scale: 1.05, filter: 'blur(10px)' }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center select-none"
+          className="js-loader-overlay fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center select-none"
         >
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 

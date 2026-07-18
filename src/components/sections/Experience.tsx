@@ -6,7 +6,7 @@ import { experiences } from '@/data/content'
 
 export default function Experience() {
   return (
-    <section id="experience" className="py-32 px-8 lg:px-16 border-t border-border bg-black">
+    <section id="experience" aria-label="Experience" className="py-32 px-8 lg:px-16 border-t border-border bg-black">
       <div className="max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="inline-flex border border-border px-3 py-1.5 mb-8">

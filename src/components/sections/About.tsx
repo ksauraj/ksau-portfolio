@@ -5,7 +5,7 @@ import { personalInfo, aboutContent, animationConfig } from '@/data/content'
 
 export default function About() {
   return (
-    <section id="about" className="py-32 px-8 lg:px-16 border-t border-border bg-black relative z-10">
+    <section id="about" aria-label="About" className="py-32 px-8 lg:px-16 border-t border-border bg-black relative z-10">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-10 gap-16 lg:gap-8">
         
         {/* Left Side: Bio (60%) */}

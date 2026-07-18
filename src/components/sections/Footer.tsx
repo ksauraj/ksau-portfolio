@@ -6,13 +6,13 @@ import { personalInfo } from '@/data/content'
 
 export default function Footer() {
   return (
-    <section id="contact" className="relative min-h-screen flex overflow-hidden bg-black border-t border-border">
+    <section id="contact" aria-label="Contact" className="relative min-h-screen flex overflow-hidden bg-black border-t border-border">
       <FloatingDoodles count={45} />
       {/* LEFT: Photo panel */}
       <div className="w-[38%] relative hidden lg:block bg-surface border-r border-border">
         <Image
-          src="/sauraj.png"
-          alt={personalInfo.name}
+          src="/sauraj.webp"
+          alt={`${personalInfo.name} — ${personalInfo.role}`}
           fill
           priority
           sizes="(max-width: 1024px) 0vw, 38vw"
@@ -24,6 +24,7 @@ export default function Footer() {
       <div className="flex-1 flex flex-col justify-between p-12 lg:p-16 relative">
         {/* Giant name */}
         <motion.div
+          data-animate
           initial={{ opacity: 0, x: 40 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
@@ -156,7 +157,7 @@ export default function Footer() {
           </div>
 
           <p className="font-mono text-xs text-muted/50 tracking-widest">
-            © 2025 Sauraj Kumar Singh · Built in Noida, India
+            © {new Date().getFullYear()} Sauraj Kumar Singh · Built in Noida, India
           </p>
         </div>
       </div>

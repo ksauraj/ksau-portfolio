@@ -6,7 +6,7 @@ import { aboutContent } from '@/data/content'
 
 export default function Education() {
   return (
-    <section id="education" className="py-32 px-8 lg:px-16 border-t border-border bg-black relative z-10">
+    <section id="education" aria-label="Education" className="py-32 px-8 lg:px-16 border-t border-border bg-black relative z-10">
       <div className="max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="inline-flex border border-border px-3 py-1.5 mb-8">

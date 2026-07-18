@@ -16,7 +16,7 @@ const item = {
 
 export default function Hero() {
   return (
-    <section id="home" className="relative min-h-screen flex flex-col justify-center px-8 lg:px-16 pt-24 overflow-hidden">
+    <section id="home" aria-label="Introduction" className="relative min-h-screen flex flex-col justify-center px-8 lg:px-16 pt-24 overflow-hidden">
       {/* Background doodles */}
       <FloatingDoodles count={45} />
 
@@ -25,10 +25,11 @@ export default function Hero() {
         <FloatingSocials />
       </div>
 
-      <motion.div 
-        variants={container} 
-        initial="hidden" 
-        animate="show" 
+      <motion.div
+        data-animate
+        variants={container}
+        initial="hidden"
+        animate="show"
         className="max-w-6xl w-full relative z-10 pointer-events-none"
       >
         <motion.div variants={item}

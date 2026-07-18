@@ -32,7 +32,7 @@ export default function Skills() {
   }, [])
 
   return (
-    <section ref={sectionRef} id="skills" className="relative py-20 px-8 lg:px-16 border-t border-border bg-black">
+    <section ref={sectionRef} id="skills" aria-label="Technical Skills" className="relative py-20 px-8 lg:px-16 border-t border-border bg-black">
       <div className="opacity-40">
         <FloatingTechIcons terminalRect={terminalRect} />
       </div>

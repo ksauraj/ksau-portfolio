@@ -1,0 +1,38 @@
+# Sauraj Kumar Singh
+
+> DevOps Engineer and open source contributor based in Noida, India. Builds and
+> automates scalable, secure infrastructure with Docker, Kubernetes, Terraform,
+> AWS, and Azure, with a focus on CI/CD, observability, and reliability.
+
+## About
+
+Sauraj Kumar Singh is a DevOps Engineer who designs self-healing clusters,
+reliable deployment pipelines, and observability stacks that detect issues before
+users do. He is an active open source contributor and a former Android ROM
+maintainer (CipherOS, PixelPlusUI). Currently pursuing a B.Tech in Information
+Technology (AKTU, 2023–2027).
+
+## Expertise
+
+- DevOps & Automation: Docker, Kubernetes, Helm, GitHub Actions, GitLab CI, Ansible, Terraform, CI/CD, Infrastructure as Code
+- Cloud & Platforms: AWS, Azure, GCP, Oracle Cloud, Linode
+- Observability & Monitoring: Prometheus, Grafana, Loki, Node Exporter, alerting
+- Security & DevSecOps: HashiCorp Vault, container security, secret management, vulnerability scanning
+- Languages: Go, Python, Bash, C, JavaScript, SQL, YAML
+- Linux & Systems: Linux, systemd, shell scripting, server administration
+
+## Links
+
+- Website: https://ksauraj.eu.org
+- GitHub: https://github.com/ksauraj
+- LinkedIn: https://linkedin.com/in/sauraj-kumar-singh-807295226
+- GitLab: https://gitlab.com/ksauraj
+- Twitter/X: https://twitter.com/k_sauraj
+- Telegram: https://ksauraj.t.me
+- YouTube: https://www.youtube.com/c/SaurajGaming
+- Email: ksauraj1@gmail.com
+
+## Contact
+
+For collaboration, open source, or DevOps/SRE opportunities, reach out via email
+at ksauraj1@gmail.com or through any of the links above.
