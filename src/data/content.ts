@@ -1,5 +1,6 @@
 export const personalInfo = {
   name: 'Sauraj Kumar Singh',
+  handle: 'ksauraj',
   role: 'DevOps Engineer',
   email: 'ksauraj1@gmail.com',
   location: 'India',

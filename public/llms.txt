@@ -1,12 +1,13 @@
-# Sauraj Kumar Singh
+# ksauraj (Sauraj Kumar Singh)
 
-> DevOps Engineer and open source contributor based in Noida, India. Builds and
-> automates scalable, secure infrastructure with Docker, Kubernetes, Terraform,
-> AWS, and Azure, with a focus on CI/CD, observability, and reliability.
+> ksauraj is the online handle of Sauraj Kumar Singh, a DevOps Engineer and open
+> source contributor based in India. He builds and automates scalable,
+> secure infrastructure with Docker, Kubernetes, Terraform, AWS, and Azure, with a
+> focus on CI/CD, observability, and reliability. His portfolio is ksauraj.eu.org.
 
 ## About
 
-Sauraj Kumar Singh is a DevOps Engineer who designs self-healing clusters,
+ksauraj (full name Sauraj Kumar Singh) is a DevOps Engineer who designs self-healing clusters,
 reliable deployment pipelines, and observability stacks that detect issues before
 users do. He is an active open source contributor and a former Android ROM
 maintainer (CipherOS, PixelPlusUI). Currently pursuing a B.Tech in Information

@@ -157,7 +157,7 @@ export default function Footer() {
           </div>
 
           <p className="font-mono text-xs text-muted/50 tracking-widest">
-            © {new Date().getFullYear()} Sauraj Kumar Singh · Built in Noida, India
+            © {new Date().getFullYear()} Sauraj Kumar Singh (@{personalInfo.handle}) · Built in India
           </p>
         </div>
       </div>

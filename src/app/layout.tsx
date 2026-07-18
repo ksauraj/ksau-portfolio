@@ -12,22 +12,26 @@ import Meteors from '@/components/ui/Meteors'
 import { personalInfo } from '@/data/content'
 
 const SITE_URL = 'https://ksauraj.eu.org'
-const TITLE = 'Sauraj Kumar Singh | DevOps Engineer'
+const TITLE = 'ksauraj — Sauraj Kumar Singh | DevOps Engineer'
 const DESCRIPTION =
-  'DevOps Engineer & Open Source contributor. Building scalable infrastructure with Docker, Kubernetes, Terraform, AWS, and Azure.'
+  'ksauraj (Sauraj Kumar Singh) is a DevOps Engineer & Open Source contributor building scalable infrastructure with Docker, Kubernetes, Terraform, AWS, and Azure.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: TITLE,
-    template: '%s | Sauraj Kumar Singh',
+    template: '%s | ksauraj',
   },
   description: DESCRIPTION,
-  applicationName: 'Sauraj Kumar Singh — Portfolio',
-  authors: [{ name: personalInfo.name, url: SITE_URL }],
-  creator: personalInfo.name,
-  publisher: personalInfo.name,
+  applicationName: 'ksauraj — Portfolio',
+  authors: [{ name: `${personalInfo.name} (ksauraj)`, url: SITE_URL }],
+  creator: 'ksauraj',
+  publisher: 'ksauraj',
   keywords: [
+    'ksauraj',
+    'ksauraj devops',
+    'ksauraj portfolio',
+    'ksauraj github',
     'Sauraj Kumar Singh',
     'DevOps Engineer',
     'Site Reliability Engineer',
@@ -58,7 +62,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     url: SITE_URL,
-    siteName: 'Sauraj Kumar Singh — Portfolio',
+    siteName: 'ksauraj — Portfolio',
     title: TITLE,
     description: DESCRIPTION,
     locale: 'en_US',
@@ -67,7 +71,7 @@ export const metadata: Metadata = {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Sauraj Kumar Singh — DevOps Engineer',
+        alt: 'ksauraj — Sauraj Kumar Singh, DevOps Engineer',
       },
     ],
   },
@@ -94,6 +98,7 @@ const personLd = {
   '@type': 'Person',
   '@id': `${SITE_URL}/#person`,
   name: personalInfo.name,
+  alternateName: ['ksauraj', 'k_sauraj'],
   url: SITE_URL,
   image: `${SITE_URL}/sauraj.webp`,
   email: `mailto:${personalInfo.email}`,
@@ -102,7 +107,6 @@ const personLd = {
   address: {
     '@type': 'PostalAddress',
     addressCountry: 'IN',
-    addressLocality: 'Noida, India',
   },
   knowsAbout: [
     'DevOps',
@@ -126,7 +130,8 @@ const websiteLd = {
   '@type': 'WebSite',
   '@id': `${SITE_URL}/#website`,
   url: SITE_URL,
-  name: TITLE,
+  name: 'ksauraj',
+  alternateName: 'Sauraj Kumar Singh',
   description: DESCRIPTION,
   inLanguage: 'en',
   publisher: { '@id': `${SITE_URL}/#person` },
@@ -137,14 +142,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="scroll-smooth">
       <head>
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/devicons/devicon@2.17.0/devicon.min.css"
+        {/* Icon fonts are decorative, not render-critical. Load them non-render-blocking
+            via an inline loader (media=print flips to all on load) so they don't delay
+            first paint / LCP on mobile. <noscript> keeps them working when JS is off. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var h=['https://cdn.jsdelivr.net/gh/devicons/devicon@2.17.0/devicon.min.css','https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.45.0/dist/tabler-icons.min.css'];h.forEach(function(u){var l=document.createElement('link');l.rel='stylesheet';l.href=u;l.media='print';l.onload=function(){l.media='all'};document.head.appendChild(l)})})();`,
+          }}
         />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.45.0/dist/tabler-icons.min.css"
-        />
+        <noscript>
+          {/* eslint-disable-next-line @next/next/no-css-tags */}
+          <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/devicons/devicon@2.17.0/devicon.min.css"
+          />
+          {/* eslint-disable-next-line @next/next/no-css-tags */}
+          <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.45.0/dist/tabler-icons.min.css"
+          />
+        </noscript>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }}

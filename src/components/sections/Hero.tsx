@@ -33,9 +33,12 @@ export default function Hero() {
         className="max-w-6xl w-full relative z-10 pointer-events-none"
       >
         <motion.div variants={item}
-          className="inline-flex items-center border border-border px-3 py-1.5 mb-8 pointer-events-auto">
+          className="inline-flex items-center gap-3 border border-border px-3 py-1.5 mb-8 pointer-events-auto">
           <span className="font-mono text-xs text-muted tracking-[0.2em] uppercase">
             [ {personalInfo.role} ]
+          </span>
+          <span className="font-mono text-xs text-white/70 tracking-[0.2em]">
+            @{personalInfo.handle}
           </span>
         </motion.div>
 
@@ -44,6 +47,12 @@ export default function Hero() {
           style={{ fontSize: 'clamp(52px, 8vw, 120px)' }}>
           Sauraj<br />Kumar Singh
         </motion.h1>
+
+        <motion.p variants={item} className="sr-only">
+          Sauraj Kumar Singh, also known online as ksauraj, is a DevOps Engineer
+          and open source contributor. This is the official portfolio and website
+          of ksauraj.
+        </motion.p>
 
         <motion.div variants={item} className="mt-6 h-8 pointer-events-auto">
           <TypewriterText
