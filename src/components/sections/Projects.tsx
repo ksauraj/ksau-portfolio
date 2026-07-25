@@ -14,10 +14,15 @@ export default function Projects() {
             <span className="font-mono text-xs text-muted tracking-[0.2em] uppercase">[ Selected Projects ]</span>
           </div>
           <h2 className="font-display font-semibold text-white text-5xl lg:text-6xl leading-tight mb-16">
-            <TypewriterText
-              phrases={["Stuff I've built and", "Things I've automated,"]}
-              className="block"
-            />
+            {/* Reserve stable height for the typewriter line so mobile wrapping
+                and deletion-to-empty don't shift the heading and the whole
+                project list up and down. */}
+            <span className="block min-h-[2.4em] sm:min-h-[1.2em]">
+              <TypewriterText
+                phrases={["Stuff I've built,", "Things I've automated,"]}
+                className="block"
+              />
+            </span>
             <span className="block">had fun breaking.</span>
           </h2>
         </ScrollReveal>
