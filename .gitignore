@@ -45,3 +45,4 @@ next-env.d.ts
 /.open-next/
 /.wrangler/
 .dev.vars
+preview-server.py

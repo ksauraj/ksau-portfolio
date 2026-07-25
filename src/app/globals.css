@@ -141,3 +141,157 @@
 .tile-group:hover .animate-tile-flicker:not(:hover) {
   animation-play-state: paused;
 }
+
+/* ============================================================
+   Blog prose — matches the portfolio theme (black bg, Space
+   Grotesk display, Inter body, Space Mono code, subtle borders).
+   ============================================================ */
+.prose-blog {
+  font-family: 'Inter', sans-serif;
+  color: #CCCCCC;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+}
+.prose-blog > * + * { margin-top: 1.5rem; }
+
+.prose-blog h1, .prose-blog h2, .prose-blog h3, .prose-blog h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  color: #FFFFFF;
+  line-height: 1.25;
+  scroll-margin-top: 6rem;
+}
+.prose-blog h2 { font-size: 1.9rem; margin-top: 3rem; margin-bottom: 1rem; }
+.prose-blog h3 { font-size: 1.4rem; margin-top: 2.25rem; margin-bottom: 0.75rem; }
+.prose-blog h4 { font-size: 1.15rem; margin-top: 2rem; }
+
+/* autolinked headings (rehype-autolink wrap) shouldn't look like links */
+.prose-blog h1 a, .prose-blog h2 a, .prose-blog h3 a, .prose-blog h4 a {
+  color: inherit; text-decoration: none;
+}
+.prose-blog h2 a:hover::before, .prose-blog h3 a:hover::before {
+  content: '# '; color: #444444;
+}
+
+.prose-blog p { color: #CCCCCC; }
+.prose-blog strong { color: #FFFFFF; font-weight: 600; }
+.prose-blog em { color: #FFFFFF; }
+
+.prose-blog a {
+  color: #FFFFFF;
+  text-decoration: underline;
+  text-decoration-color: #444444;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s;
+}
+.prose-blog a:hover { text-decoration-color: #FFFFFF; }
+
+.prose-blog ul, .prose-blog ol { padding-left: 1.5rem; }
+.prose-blog ul { list-style: none; }
+.prose-blog ul > li { position: relative; }
+.prose-blog ul > li::before {
+  content: '▹'; position: absolute; left: -1.5rem; color: #888888;
+  font-family: 'Space Mono', monospace;
+}
+.prose-blog ol { list-style: decimal; }
+.prose-blog ol > li::marker { color: #888888; font-family: 'Space Mono', monospace; }
+.prose-blog li { margin-top: 0.5rem; color: #CCCCCC; }
+
+.prose-blog blockquote {
+  border-left: 2px solid #444444;
+  padding: 0.5rem 0 0.5rem 1.5rem;
+  color: #888888;
+  font-style: italic;
+}
+
+/* Inline code */
+.prose-blog code {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85em;
+  background: #0D0D0D;
+  border: 1px solid #1A1A1A;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  color: #FFFFFF;
+}
+/* Code blocks (rehype-pretty-code) */
+.prose-blog pre {
+  font-family: 'Space Mono', monospace;
+  background: #050505 !important;
+  border: 1px solid #1A1A1A;
+  border-radius: 8px;
+  padding: 1.25rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+.prose-blog pre code {
+  background: transparent; border: 0; padding: 0; font-size: inherit;
+  color: inherit;
+}
+.prose-blog pre code [data-line] { padding: 0 0.25rem; }
+
+/* Tables (GFM) */
+.prose-blog table {
+  width: 100%; border-collapse: collapse; font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+}
+.prose-blog th, .prose-blog td {
+  border: 1px solid #1A1A1A; padding: 0.6rem 0.9rem; text-align: left;
+}
+.prose-blog th {
+  background: #0D0D0D; color: #FFFFFF; font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.prose-blog td { color: #CCCCCC; }
+
+.prose-blog hr { border: 0; border-top: 1px solid #1A1A1A; margin: 3rem 0; }
+
+.prose-blog img, .prose-blog video, .prose-blog iframe { max-width: 100%; }
+
+/* ============================================================
+   Blog code-block copy glare — one-shot sweep on successful copy.
+   Mirrors the site's card-glare / btn-glare aesthetic.
+   ============================================================ */
+.code-block { position: relative; overflow: hidden; }
+
+@keyframes code-copy-sweep {
+  0%   { left: -60%; opacity: 0; }
+  10%  { opacity: 1; }
+  100% { left: 130%; opacity: 0; }
+}
+
+.code-copy-glare {
+  position: absolute;
+  top: -10%;
+  left: -60%;
+  width: 40%;
+  height: 120%;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 35%,
+    rgba(255, 255, 255, 0.10) 50%,
+    rgba(255, 255, 255, 0.04) 65%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  animation: code-copy-sweep 0.7s ease-out;
+}
+
+/* The prose pre already has border/padding; keep copy button clear of code */
+.code-block > pre { margin: 0; }
+.prose-blog .code-block { margin-top: 1.5rem; margin-bottom: 1.5rem; }
+
+/* Mermaid viewport resize handle affordance */
+.mermaid-viewport::-webkit-resizer { background: transparent; }
+.mermaid-viewport { border-bottom: 1px solid #1A1A1A; }
+.mermaid-diagram svg {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
