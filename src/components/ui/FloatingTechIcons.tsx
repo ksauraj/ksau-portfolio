@@ -76,6 +76,8 @@ export default function FloatingTechIcons({ terminalRect }: Props) {
   const mouseRef = useRef({ x: -9999, y: -9999, active: false })
   const rafRef = useRef<number>(0)
   const sizeRef = useRef({ w: 0, h: 0 })
+  const isVisibleRef = useRef(true)
+  const lastFrameRef = useRef(0)
   const tRectRef = useRef(terminalRect)
 
   // Sync ref to avoid closing physics closure
@@ -160,7 +162,20 @@ export default function FloatingTechIcons({ terminalRect }: Props) {
   }, [])
 
   useEffect(() => {
-    const tick = () => {
+    const element = containerRef.current
+    if (!element) return
+    const observer = new IntersectionObserver(([entry]) => { isVisibleRef.current = entry.isIntersecting }, { rootMargin: '200px' })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const tick = (now: number) => {
+      if (!isVisibleRef.current || now - lastFrameRef.current < 33) {
+        rafRef.current = requestAnimationFrame(tick)
+        return
+      }
+      lastFrameRef.current = now
       const container = containerRef.current
       if (!container || nodesRef.current.length === 0) { rafRef.current = requestAnimationFrame(tick); return }
       const rect = container.getBoundingClientRect()

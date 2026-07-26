@@ -1,0 +1,28 @@
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+
+const root = new URL('../', import.meta.url)
+const read = (path) => readFileSync(new URL(path, root), 'utf8')
+const css = read('src/app/globals.css')
+const provider = read('src/components/ui/ThemeProvider.tsx')
+const socials = read('src/components/ui/FloatingSocials.tsx')
+const tech = read('src/components/ui/FloatingTechIcons.tsx')
+const doodles = read('src/components/ui/FloatingDoodles.tsx')
+const hero = read('src/components/sections/Hero.tsx')
+const footer = read('src/components/sections/Footer.tsx')
+
+assert.match(css, /theme-rain/, 'theme transition uses a vertical rain animation')
+assert.match(css, /animation:\s*theme-(?:rain|glare-fall)\s+1\.2s/, 'theme transition is deliberately slower')
+assert.match(css, /translate3d\(0, -130%/, 'matrix glyphs enter from the top')
+assert.match(provider, /matrixColumns\(count = 12, rows = 18\)/, 'transition uses a bounded number of matrix columns')
+assert.match(provider, /theme-transition__rain/, 'matrix columns are rendered independently')
+assert.match(socials, /IntersectionObserver/, 'social physics pauses off-screen')
+assert.match(tech, /IntersectionObserver/, 'tech physics pauses off-screen')
+assert.match(socials, /frameInterval|lastFrame/, 'social physics is frame-rate capped')
+assert.match(tech, /frameInterval|lastFrame/, 'tech physics is frame-rate capped')
+assert.match(doodles, /count = 24|count = 18/, 'doodle default is bounded')
+assert.match(hero, /FloatingDoodles count=\{24\}/, 'hero doodle count is reduced')
+assert.match(footer, /FloatingDoodles count=\{24\}/, 'footer doodle count is reduced')
+assert.match(css, /content-visibility:\s*auto/, 'off-screen sections skip rendering work')
+assert.match(css, /prefers-reduced-motion:\s*reduce/, 'reduced motion remains supported')
+console.log('performance and matrix transition contract: ok')

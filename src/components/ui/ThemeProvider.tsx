@@ -4,17 +4,20 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 type Theme = 'dark' | 'light'
 type ThemeContextValue = { theme: Theme; toggleTheme: () => void }
-
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
-function binaryStream(length = 220) {
-  return Array.from({ length }, () => (Math.random() > 0.5 ? '1' : '0')).join('')
+function matrixColumns(count = 12, rows = 18) {
+  return Array.from({ length: count }, (_, column) => ({
+    id: `${column}-${Date.now()}`,
+    text: Array.from({ length: rows }, () => (Math.random() > 0.5 ? '1' : '0')).join(' '),
+    delay: `${(column * 0.07).toFixed(2)}s`,
+  }))
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('dark')
   const [transitionKey, setTransitionKey] = useState(0)
-  const [bits, setBits] = useState('')
+  const [columns, setColumns] = useState<ReturnType<typeof matrixColumns>>([])
 
   useEffect(() => {
     const stored = window.localStorage.getItem('ksau-theme')
@@ -37,7 +40,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = useCallback(() => {
     const next = theme === 'dark' ? 'light' : 'dark'
-    setBits(binaryStream())
+    setColumns(matrixColumns())
     setTransitionKey((key) => key + 1)
     setTheme(next)
     document.documentElement.dataset.theme = next
@@ -51,7 +54,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       {children}
       <div key={transitionKey} aria-hidden="true" className={transitionKey ? 'theme-transition' : 'theme-transition theme-transition--idle'}>
         <div className="theme-transition__glare" />
-        <div className="theme-transition__bits">{bits}</div>
+        <div className="theme-transition__rain">
+          {columns.map((column) => <span key={column.id} style={{ animationDelay: column.delay }}>{column.text}</span>)}
+        </div>
       </div>
     </ThemeContext.Provider>
   )
