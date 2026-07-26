@@ -24,7 +24,7 @@ assert.match(navbar, /useTheme/, 'navbar exposes the theme control')
 assert.match(provider, /meta\[name=["']theme-color["']\]/, 'browser chrome follows the active theme')
 assert.match(css, /html\[data-theme=['"]light['"]\]/, 'light palette exists')
 assert.match(css, /prefers-reduced-motion:\s*reduce/, 'transition respects reduced-motion')
-assert.match(css, /theme-transition__bits/, 'binary glare transition is styled')
+assert.match(css, /theme-transition__(?:rain|glare)/, 'binary glare transition is styled')
 assert.match(tailwind, /var\(--color-bg\)/, 'Tailwind colors use theme tokens')
 
 console.log('theme contract: ok')

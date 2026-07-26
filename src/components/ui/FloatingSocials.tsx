@@ -53,6 +53,8 @@ export default function FloatingSocials() {
     alpha: number
     phase: 'in' | 'out'
   }[]>([])
+  const isVisibleRef = useRef(true)
+  const lastFrameRef = useRef(0)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -168,9 +170,22 @@ export default function FloatingSocials() {
   }, [])
 
   useEffect(() => {
+    const element = containerRef.current
+    if (!element) return
+    const observer = new IntersectionObserver(([entry]) => { isVisibleRef.current = entry.isIntersecting }, { rootMargin: '200px' })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
     let animationId: number
 
-    const updatePhysics = () => {
+    const updatePhysics = (now: number) => {
+      if (!isVisibleRef.current || now - lastFrameRef.current < 33) {
+        animationId = requestAnimationFrame(updatePhysics)
+        return
+      }
+      lastFrameRef.current = now
       if (!containerRef.current || nodesRef.current.length === 0) {
         animationId = requestAnimationFrame(updatePhysics)
         return

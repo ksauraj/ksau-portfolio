@@ -18,7 +18,7 @@ export default function Hero() {
   return (
     <section id="home" aria-label="Introduction" className="relative min-h-screen flex flex-col justify-center px-8 lg:px-16 pt-24 overflow-hidden">
       {/* Background doodles */}
-      <FloatingDoodles count={45} />
+      <FloatingDoodles count={24} />
 
       {/* Floating socials spanning the right 55% area absolutely */}
       <div className="absolute right-0 top-0 w-[55vw] h-full pointer-events-none z-20">

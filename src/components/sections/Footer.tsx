@@ -7,7 +7,7 @@ import { personalInfo } from '@/data/content'
 export default function Footer() {
   return (
     <section id="contact" aria-label="Contact" className="relative min-h-screen flex overflow-hidden bg-bg border-t border-border">
-      <FloatingDoodles count={45} />
+      <FloatingDoodles count={24} />
       {/* LEFT: Photo panel */}
       <div className="w-[38%] relative hidden lg:block bg-surface border-r border-border">
         <Image

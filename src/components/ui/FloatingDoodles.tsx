@@ -12,7 +12,7 @@ interface DoodleItem {
   type: number
 }
 
-function FloatingDoodlesComponent({ count = 18, isFastGlow = false }: { count?: number; isFastGlow?: boolean }) {
+function FloatingDoodlesComponent({ count = 24, isFastGlow = false }: { count?: number; isFastGlow?: boolean }) {
   const [items, setItems] = useState<DoodleItem[]>([])
 
   useEffect(() => {
