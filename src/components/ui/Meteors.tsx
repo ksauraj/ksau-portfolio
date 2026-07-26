@@ -20,7 +20,7 @@ export default function Meteors({ number = 15 }: { number?: number }) {
         return (
           <motion.span
             key={idx}
-            className="absolute w-[180px] h-[1.5px] bg-gradient-to-l from-white via-white/40 to-transparent pointer-events-none before:content-[''] before:absolute before:right-0 before:w-1 before:h-1 before:bg-white before:rounded-full before:shadow-[0_0_12px_#fff]"
+            className="absolute w-[180px] h-[1.5px] bg-gradient-to-l from-fg via-fg/40 to-transparent pointer-events-none before:content-[''] before:absolute before:right-0 before:w-1 before:h-1 before:bg-fg before:rounded-full before:shadow-[0_0_12px_var(--theme-glow)]"
             style={{
               top: `${randomTop}%`,
               right: '-200px',

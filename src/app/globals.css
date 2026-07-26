@@ -2,6 +2,74 @@
 @tailwind components;
 @tailwind utilities;
 
+:root,
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --color-bg: 0 0 0;
+  --color-surface: 13 13 13;
+  --color-card: 8 8 8;
+  --color-border: 26 26 26;
+  --color-border-hover: 68 68 68;
+  --color-muted: 136 136 136;
+  --color-muted-dark: 68 68 68;
+  --color-fg: 255 255 255;
+  --color-fg-dim: 204 204 204;
+  --theme-nav: 0 0 0;
+  --theme-glow: 255 255 255;
+}
+
+html[data-theme='light'] {
+  color-scheme: light;
+  --color-bg: 246 247 249;
+  --color-surface: 238 240 243;
+  --color-card: 255 255 255;
+  --color-border: 211 214 220;
+  --color-border-hover: 107 114 128;
+  --color-muted: 79 86 99;
+  --color-muted-dark: 156 163 175;
+  --color-fg: 17 24 39;
+  --color-fg-dim: 55 65 81;
+  --theme-nav: 246 247 249;
+  --theme-glow: 17 24 39;
+}
+
+html, body { background: rgb(var(--color-bg)); color: rgb(var(--color-fg)); }
+body, main, section, nav, article { transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease; }
+
+@keyframes theme-sweep {
+  0% { transform: translate3d(-130%, 0, 0) skewX(-14deg); opacity: 0; }
+  12% { opacity: 1; }
+  100% { transform: translate3d(230%, 0, 0) skewX(-14deg); opacity: 0; }
+}
+
+.theme-transition { position: fixed; inset: 0; z-index: 10000; pointer-events: none; overflow: hidden; }
+.theme-transition--idle { display: none; }
+.theme-transition__glare,
+.theme-transition__bits {
+  position: absolute; top: -25%; left: -35%; width: 46%; height: 150%;
+  transform: translate3d(-130%, 0, 0) skewX(-14deg);
+  animation: theme-sweep 760ms cubic-bezier(.22, 1, .36, 1) both;
+}
+.theme-transition__glare {
+  background: linear-gradient(90deg, transparent, rgb(var(--color-fg) / .05) 24%, rgb(var(--color-fg) / .24) 50%, rgb(var(--color-fg) / .05) 76%, transparent);
+  filter: blur(5px); box-shadow: 0 0 48px rgb(var(--theme-glow) / .14);
+}
+.theme-transition__bits {
+  display: flex; align-items: center; overflow: hidden; padding: 2rem;
+  color: rgb(var(--color-fg) / .36); font: 700 11px/1.55 'Space Mono', monospace;
+  letter-spacing: .35em; overflow-wrap: anywhere; mix-blend-mode: difference;
+}
+
+@media (max-width: 640px) {
+  .theme-transition__glare, .theme-transition__bits { width: 72%; left: -60%; animation-duration: 620ms; }
+  .theme-transition__bits { font-size: 9px; opacity: .72; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-transition__glare, .theme-transition__bits { animation: none; display: none; }
+  body, main, section, nav, article { transition-duration: 0.01ms; }
+}
+
 @keyframes flicker-glow {
   0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
     opacity: 0.99;
@@ -258,6 +326,37 @@
 .prose-blog hr { border: 0; border-top: 1px solid #1A1A1A; margin: 3rem 0; }
 
 .prose-blog img, .prose-blog video, .prose-blog iframe { max-width: 100%; }
+
+/* Blog prose follows the active palette while code remains terminal-like. */
+.prose-blog,
+.prose-blog p,
+.prose-blog li,
+.prose-blog td { color: rgb(var(--color-fg-dim)); }
+.prose-blog h1, .prose-blog h2, .prose-blog h3, .prose-blog h4,
+.prose-blog strong, .prose-blog em, .prose-blog a { color: rgb(var(--color-fg)); }
+.prose-blog a { text-decoration-color: rgb(var(--color-muted-dark)); }
+.prose-blog a:hover { text-decoration-color: rgb(var(--color-fg)); }
+.prose-blog ul > li::before, .prose-blog ol > li::marker { color: rgb(var(--color-muted)); }
+.prose-blog blockquote { border-left-color: rgb(var(--color-border-hover)); color: rgb(var(--color-muted)); }
+.prose-blog code { background: rgb(var(--color-surface)); border-color: rgb(var(--color-border)); color: rgb(var(--color-fg)); }
+.prose-blog pre { background: rgb(var(--color-card)) !important; border-color: rgb(var(--color-border)); }
+.prose-blog .table-scroll,
+.prose-blog th, .prose-blog td { border-color: rgb(var(--color-border)); }
+.prose-blog th { background: rgb(var(--color-surface)); color: rgb(var(--color-fg)); }
+.prose-blog hr { border-top-color: rgb(var(--color-border)); }
+.mermaid-viewport { border-bottom-color: rgb(var(--color-border)); }
+
+html[data-theme='light'] .bg-\[\#050505\] { background-color: rgb(var(--color-surface)); }
+html[data-theme='light'] .animate-flicker-glow,
+html[data-theme='light'] .animate-tile-flicker { animation-name: none; }
+
+/* The interactive skills terminal intentionally stays a dark terminal in both modes. */
+html[data-theme='light'] #skills [style*="background"] {
+  --color-fg: 255 255 255;
+  --color-bg: 0 0 0;
+}
+html[data-theme='light'] #skills .bg-card,
+html[data-theme='light'] #skills .bg-surface { color: #fff; }
 
 /* ============================================================
    Blog code-block copy glare — one-shot sweep on successful copy.

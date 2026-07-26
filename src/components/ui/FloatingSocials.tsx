@@ -409,7 +409,7 @@ export default function FloatingSocials() {
             willChange: 'transform',
             zIndex: 10,
           }}
-          className="rounded-full bg-white/5 border border-white/10 hover:border-white/50 hover:bg-white hover:text-black flex items-center justify-center text-white/60 transition-colors duration-300 backdrop-blur-[2px] shadow-sm pointer-events-auto cursor-pointer"
+          className="rounded-full bg-fg/5 border border-fg/10 hover:border-fg/50 hover:bg-fg hover:text-bg flex items-center justify-center text-fg/60 transition-colors duration-300 backdrop-blur-[2px] shadow-sm pointer-events-auto cursor-pointer"
           title={node.name}
         >
           {node.icon}

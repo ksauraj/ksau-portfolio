@@ -6,13 +6,13 @@ import { experiences } from '@/data/content'
 
 export default function Experience() {
   return (
-    <section id="experience" aria-label="Experience" className="py-32 px-8 lg:px-16 border-t border-border bg-black">
+    <section id="experience" aria-label="Experience" className="py-32 px-8 lg:px-16 border-t border-border bg-bg">
       <div className="max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="inline-flex border border-border px-3 py-1.5 mb-8">
             <span className="font-mono text-xs text-muted tracking-[0.2em] uppercase">[ Experience ]</span>
           </div>
-          <h2 className="font-display font-semibold text-white text-5xl lg:text-6xl leading-tight mb-16">
+          <h2 className="font-display font-semibold text-fg text-5xl lg:text-6xl leading-tight mb-16">
             Where I&apos;ve shipped<br />real infrastructure.
           </h2>
         </ScrollReveal>
@@ -30,7 +30,7 @@ export default function Experience() {
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-6">
                   <div>
-                    <h3 className="font-display font-semibold text-white text-xl">{exp.role}</h3>
+                    <h3 className="font-display font-semibold text-fg text-xl">{exp.role}</h3>
                     <p className="font-mono text-sm text-muted mt-1">{exp.company} · {exp.type}</p>
                   </div>
                   <span className="font-mono text-xs text-muted border border-border px-3 py-1.5 shrink-0">
@@ -40,7 +40,7 @@ export default function Experience() {
                 <ul className="space-y-2">
                   {exp.bullets.map((b, bi) => (
                     <li key={bi} className="font-body text-sm text-muted flex gap-3">
-                      <span className="text-white/20 shrink-0">·</span>
+                      <span className="text-fg/20 shrink-0">·</span>
                       <span>{b}</span>
                     </li>
                   ))}

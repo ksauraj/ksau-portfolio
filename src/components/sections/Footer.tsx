@@ -6,7 +6,7 @@ import { personalInfo } from '@/data/content'
 
 export default function Footer() {
   return (
-    <section id="contact" aria-label="Contact" className="relative min-h-screen flex overflow-hidden bg-black border-t border-border">
+    <section id="contact" aria-label="Contact" className="relative min-h-screen flex overflow-hidden bg-bg border-t border-border">
       <FloatingDoodles count={45} />
       {/* LEFT: Photo panel */}
       <div className="w-[38%] relative hidden lg:block bg-surface border-r border-border">
@@ -32,7 +32,7 @@ export default function Footer() {
           className="flex-1 flex items-center"
         >
           <h2
-            className="font-display font-bold text-white leading-[0.9]"
+            className="font-display font-bold text-fg leading-[0.9]"
             style={{ fontSize: 'clamp(50px, 8vw, 120px)' }}
           >
             {personalInfo.logoName}<br />{personalInfo.logoSub}
@@ -41,7 +41,7 @@ export default function Footer() {
 
         {/* SVG squiggle decoration */}
         <motion.svg
-          className="absolute right-24 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none hidden md:block z-0"
+          className="absolute right-24 top-1/2 -translate-y-1/2 text-fg/20 pointer-events-none hidden md:block z-0"
           width="80" height="60" viewBox="0 0 80 60" fill="none"
           initial={{ pathLength: 0, opacity: 0 }}
           whileInView={{ pathLength: 1, opacity: 1 }}
@@ -58,7 +58,7 @@ export default function Footer() {
         {/* Floating DevOps Doodles */}
         {/* Doodle 1: Kubernetes Wheel */}
         <motion.svg
-          className="absolute top-[12%] right-[18%] text-white/5 pointer-events-none w-20 h-20 z-0 hidden md:block"
+          className="absolute top-[12%] right-[18%] text-fg/5 pointer-events-none w-20 h-20 z-0 hidden md:block"
           viewBox="0 0 100 100"
           fill="none"
           stroke="currentColor"
@@ -80,7 +80,7 @@ export default function Footer() {
 
         {/* Doodle 2: Database cylinders */}
         <motion.svg
-          className="absolute top-[50%] left-[8%] text-white/5 pointer-events-none w-14 h-18 z-0 hidden md:block"
+          className="absolute top-[50%] left-[8%] text-fg/5 pointer-events-none w-14 h-18 z-0 hidden md:block"
           viewBox="0 0 60 80"
           fill="none"
           stroke="currentColor"
@@ -99,7 +99,7 @@ export default function Footer() {
 
         {/* Doodle 3: Cloud outline */}
         <motion.svg
-          className="absolute top-[28%] right-[8%] text-white/5 pointer-events-none w-20 h-16 z-0 hidden md:block"
+          className="absolute top-[28%] right-[8%] text-fg/5 pointer-events-none w-20 h-16 z-0 hidden md:block"
           viewBox="0 0 100 80"
           fill="none"
           stroke="currentColor"
@@ -112,7 +112,7 @@ export default function Footer() {
 
         {/* Doodle 4: Topology nodes */}
         <motion.svg
-          className="absolute bottom-[35%] right-[14%] text-white/5 pointer-events-none w-20 h-20 z-0 hidden md:block"
+          className="absolute bottom-[35%] right-[14%] text-fg/5 pointer-events-none w-20 h-20 z-0 hidden md:block"
           viewBox="0 0 100 100"
           fill="none"
           stroke="currentColor"
@@ -138,11 +138,11 @@ export default function Footer() {
         <div className="mt-auto">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8">
             <a href={`mailto:${personalInfo.email}`}
-              className="font-mono text-sm text-muted hover:text-white transition-colors">
+              className="font-mono text-sm text-muted hover:text-fg transition-colors">
               {personalInfo.email}
             </a>
             <a href="/resume.pdf" download
-               className="inline-flex items-center gap-2 border border-white/20 bg-white/5 hover:bg-white hover:text-black font-mono text-xs text-white px-4 py-2 transition-all duration-300 btn-glare animate-flicker-glow">
+               className="inline-flex items-center gap-2 border border-fg/20 bg-fg/5 hover:bg-fg hover:text-bg font-mono text-xs text-fg px-4 py-2 transition-all duration-300 btn-glare animate-flicker-glow">
               <span>[ Download Resume ]</span>
             </a>
           </div>
@@ -150,7 +150,7 @@ export default function Footer() {
           <div className="flex flex-wrap gap-x-6 gap-y-3 mb-8">
             {personalInfo.socials.map((s) => (
               <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
-                className="font-mono text-xs text-muted hover:text-white transition-colors tracking-widest uppercase">
+                className="font-mono text-xs text-muted hover:text-fg transition-colors tracking-widest uppercase">
                 {s.label}
               </a>
             ))}

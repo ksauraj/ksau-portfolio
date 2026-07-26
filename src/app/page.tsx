@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <>
       <Loader />
-      <main className="relative min-h-screen bg-black text-white">
+      <main className="relative min-h-screen bg-bg text-fg">
         <Navbar />
         <ResponsiveNotice />
         <Hero />

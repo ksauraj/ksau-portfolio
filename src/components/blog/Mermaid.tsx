@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { useTheme } from '@/components/ui/ThemeProvider'
 
 // Client-side Mermaid renderer, themed to match the portfolio:
 // pure-black canvas, white/grey strokes, Space Mono labels, subtle borders.
@@ -7,56 +8,50 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 let mermaidPromise: Promise<typeof import('mermaid').default> | null = null
 
 function loadMermaid() {
-  if (!mermaidPromise) {
-    mermaidPromise = import('mermaid').then((m) => {
-      const mermaid = m.default
-      mermaid.initialize({
-        startOnLoad: false,
-        securityLevel: 'strict',
-        theme: 'base',
-        fontFamily: "'Space Mono', monospace",
-        themeVariables: {
-          background: '#000000',
-          primaryColor: '#0D0D0D',
-          primaryBorderColor: '#444444',
-          primaryTextColor: '#FFFFFF',
-          secondaryColor: '#080808',
-          secondaryBorderColor: '#1A1A1A',
-          secondaryTextColor: '#CCCCCC',
-          tertiaryColor: '#050505',
-          tertiaryBorderColor: '#1A1A1A',
-          lineColor: '#888888',
-          textColor: '#CCCCCC',
-          mainBkg: '#0D0D0D',
-          nodeBorder: '#444444',
-          nodeTextColor: '#FFFFFF',
-          clusterBkg: '#050505',
-          clusterBorder: '#1A1A1A',
-          edgeLabelBackground: '#000000',
-          fontSize: '14px',
-          actorBkg: '#0D0D0D',
-          actorBorder: '#444444',
-          actorTextColor: '#FFFFFF',
-          signalColor: '#888888',
-          signalTextColor: '#CCCCCC',
-          labelBoxBkgColor: '#0D0D0D',
-          labelBoxBorderColor: '#444444',
-          labelTextColor: '#FFFFFF',
-          loopTextColor: '#CCCCCC',
-          noteBkgColor: '#1A1A1A',
-          noteBorderColor: '#444444',
-          noteTextColor: '#FFFFFF',
-        },
-      })
-      return mermaid
-    })
-  }
+  if (!mermaidPromise) mermaidPromise = import('mermaid').then((m) => m.default)
   return mermaidPromise
+}
+
+const diagramTheme = (theme: 'dark' | 'light') => {
+  const light = theme === 'light'
+  return {
+    background: light ? '#F6F7F9' : '#000000',
+    primaryColor: light ? '#FFFFFF' : '#0D0D0D',
+    primaryBorderColor: light ? '#9CA3AF' : '#444444',
+    primaryTextColor: light ? '#111827' : '#FFFFFF',
+    secondaryColor: light ? '#EEF0F3' : '#080808',
+    secondaryBorderColor: light ? '#D3D6DC' : '#1A1A1A',
+    secondaryTextColor: light ? '#374151' : '#CCCCCC',
+    tertiaryColor: light ? '#F6F7F9' : '#050505',
+    tertiaryBorderColor: light ? '#D3D6DC' : '#1A1A1A',
+    lineColor: light ? '#4B5563' : '#888888',
+    textColor: light ? '#374151' : '#CCCCCC',
+    mainBkg: light ? '#FFFFFF' : '#0D0D0D',
+    nodeBorder: light ? '#9CA3AF' : '#444444',
+    nodeTextColor: light ? '#111827' : '#FFFFFF',
+    clusterBkg: light ? '#F6F7F9' : '#050505',
+    clusterBorder: light ? '#D3D6DC' : '#1A1A1A',
+    edgeLabelBackground: light ? '#F6F7F9' : '#000000',
+    actorBkg: light ? '#FFFFFF' : '#0D0D0D',
+    actorBorder: light ? '#9CA3AF' : '#444444',
+    actorTextColor: light ? '#111827' : '#FFFFFF',
+    signalColor: light ? '#4B5563' : '#888888',
+    signalTextColor: light ? '#374151' : '#CCCCCC',
+    labelBoxBkgColor: light ? '#FFFFFF' : '#0D0D0D',
+    labelBoxBorderColor: light ? '#9CA3AF' : '#444444',
+    labelTextColor: light ? '#111827' : '#FFFFFF',
+    loopTextColor: light ? '#374151' : '#CCCCCC',
+    noteBkgColor: light ? '#EEF0F3' : '#1A1A1A',
+    noteBorderColor: light ? '#9CA3AF' : '#444444',
+    noteTextColor: light ? '#111827' : '#FFFFFF',
+    fontSize: '14px',
+  }
 }
 
 let idCounter = 0
 
 export default function Mermaid({ chart }: { chart: string }) {
+  const { theme } = useTheme()
   const [svg, setSvg] = useState<string>('')
   const [error, setError] = useState<string>('')
   const [id] = useState(() => `mmd-${++idCounter}`)
@@ -74,7 +69,16 @@ export default function Mermaid({ chart }: { chart: string }) {
   useEffect(() => {
     let cancelled = false
     loadMermaid()
-      .then((mermaid) => mermaid.render(id, chart.trim()))
+      .then((mermaid) => {
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: 'strict',
+          theme: 'base',
+          fontFamily: "'Space Mono', monospace",
+          themeVariables: diagramTheme(theme),
+        })
+        return mermaid.render(`${id}-${theme}`, chart.trim())
+      })
       .then(({ svg }) => {
         if (!cancelled) setSvg(svg)
       })
@@ -84,7 +88,7 @@ export default function Mermaid({ chart }: { chart: string }) {
     return () => {
       cancelled = true
     }
-  }, [chart, id])
+  }, [chart, id, theme])
 
   const clampScale = (s: number) => Math.min(4, Math.max(0.3, s))
   const zoomBy = useCallback((factor: number) => setScale((s) => clampScale(s * factor)), [])
@@ -225,7 +229,7 @@ function ToolBtn({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="w-7 h-7 grid place-items-center border border-border text-white/70 hover:text-white hover:border-white/40 font-mono text-sm transition-colors"
+      className="w-7 h-7 grid place-items-center border border-border text-fg/70 hover:text-fg hover:border-fg/40 font-mono text-sm transition-colors"
     >
       {children}
     </button>

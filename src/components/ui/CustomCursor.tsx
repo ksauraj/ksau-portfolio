@@ -43,12 +43,12 @@ export default function CustomCursor() {
     <>
       {/* Inner dot */}
       <motion.div
-        className="fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2"
+        className="fixed top-0 left-0 w-1.5 h-1.5 bg-fg rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2"
         style={{ x: springX, y: springY }}
       />
       {/* Outer ring */}
       <motion.div
-        className="fixed top-0 left-0 w-10 h-10 rounded-full border border-white/30 pointer-events-none z-[9998] -translate-x-1/2 -translate-y-1/2"
+        className="fixed top-0 left-0 w-10 h-10 rounded-full border border-fg/30 pointer-events-none z-[9998] -translate-x-1/2 -translate-y-1/2"
         style={{ x: outerX, y: outerY }}
       />
     </>

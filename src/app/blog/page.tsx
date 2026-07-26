@@ -50,7 +50,7 @@ export default function BlogIndex() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogLd) }}
       />
-      <main className="relative min-h-screen bg-black text-white">
+      <main className="relative min-h-screen bg-bg text-fg">
         <Navbar />
         <section className="pt-40 pb-32 px-8 lg:px-16">
           <div className="max-w-4xl mx-auto">
@@ -60,7 +60,7 @@ export default function BlogIndex() {
                   [ Blog ]
                 </span>
               </div>
-              <h1 className="font-display font-semibold text-white text-5xl lg:text-6xl leading-tight mb-6">
+              <h1 className="font-display font-semibold text-fg text-5xl lg:text-6xl leading-tight mb-6">
                 Notes from the terminal.
               </h1>
               <p className="font-body text-lg text-muted max-w-2xl mb-16">
@@ -81,10 +81,10 @@ export default function BlogIndex() {
                       <article className="card-hover-glare animate-tile-flicker border border-border bg-card p-8 transition-shadow duration-300">
                         <div className="flex flex-wrap items-center gap-3 mb-4 font-mono text-xs text-muted">
                           <span>{formatDate(post.date)}</span>
-                          <span className="text-white/20">·</span>
+                          <span className="text-fg/20">·</span>
                           <span>{post.readingTime}</span>
                         </div>
-                        <h2 className="font-display font-semibold text-white text-2xl lg:text-3xl mb-3 group-hover:text-fg-dim transition-colors">
+                        <h2 className="font-display font-semibold text-fg text-2xl lg:text-3xl mb-3 group-hover:text-fg-dim transition-colors">
                           {post.title}
                         </h2>
                         <p className="font-body text-base text-muted leading-relaxed mb-6">
