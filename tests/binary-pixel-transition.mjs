@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
+
+const root = new URL('../', import.meta.url)
+const read = (path) => readFileSync(new URL(path, root), 'utf8')
+const provider = read('src/components/ui/ThemeProvider.tsx')
+const pixelGrid = read('src/components/ui/BinaryPixelTransition.tsx')
+const css = read('src/app/globals.css')
+
+assert.match(provider, /BinaryPixelTransition/, 'provider mounts the canvas transition')
+assert.doesNotMatch(provider, /matrixColumns|theme-transition__rain|theme-transition__glare/, 'sparse DOM rain is removed')
+assert.match(pixelGrid, /<canvas/, 'transition uses one canvas rather than thousands of DOM nodes')
+assert.match(pixelGrid, /requestAnimationFrame/, 'transition is frame-driven')
+assert.match(pixelGrid, /CELL_SIZE\s*=\s*11/, 'binary cells are tightly packed')
+assert.match(pixelGrid, /innerWidth.*CELL_SIZE|Math\.ceil\(.*width.*CELL_SIZE/s, 'grid spans viewport width')
+assert.match(pixelGrid, /innerHeight.*CELL_SIZE|Math\.ceil\(.*height.*CELL_SIZE/s, 'grid spans viewport height')
+assert.match(pixelGrid, /waveGlow|waveWidth/, 'bit brightness creates the glare wave')
+assert.doesNotMatch(css, /theme-transition__(?:glare|rain)/, 'legacy sparse transition styles are removed')
+assert.match(pixelGrid, /devicePixelRatio.*Math\.min|Math\.min\([^)]*devicePixelRatio/s, 'canvas pixel density is capped')
+assert.match(pixelGrid, /window\.matchMedia\('\(prefers-reduced-motion: reduce\)'\)/, 'canvas respects reduced motion')
+assert.match(pixelGrid, /cancelAnimationFrame/, 'animation cleans up its frame loop')
+console.log('full-screen binary pixel transition contract: ok')
