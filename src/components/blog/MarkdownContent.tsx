@@ -40,6 +40,13 @@ const components = {
   ),
   // Every code block gets a copy button (with copy-glare effect).
   pre: (props: React.HTMLAttributes<HTMLPreElement>) => <CodeBlock {...props} />,
+  // Wrap tables so they scroll horizontally on narrow screens instead of
+  // overflowing off the viewport.
+  table: (props: React.TableHTMLAttributes<HTMLTableElement>) => (
+    <div className="table-scroll">
+      <table {...props} />
+    </div>
+  ),
 }
 
 const prettyCodeOptions = {
