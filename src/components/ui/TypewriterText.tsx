@@ -44,7 +44,7 @@ export default function TypewriterText({ phrases, className }: TypewriterTextPro
       <motion.span
         animate={{ opacity: [1, 0] }}
         transition={{ duration: 0.6, repeat: Infinity, repeatType: 'reverse' }}
-        className="inline-block w-0.5 h-[1em] bg-white ml-0.5 align-middle"
+        className="inline-block w-0.5 h-[1em] bg-fg ml-0.5 align-middle"
       />
     </span>
   )

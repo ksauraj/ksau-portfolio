@@ -6,13 +6,13 @@ import { aboutContent } from '@/data/content'
 
 export default function Education() {
   return (
-    <section id="education" aria-label="Education" className="py-32 px-8 lg:px-16 border-t border-border bg-black relative z-10">
+    <section id="education" aria-label="Education" className="py-32 px-8 lg:px-16 border-t border-border bg-bg relative z-10">
       <div className="max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="inline-flex border border-border px-3 py-1.5 mb-8">
             <span className="font-mono text-xs text-muted tracking-[0.2em] uppercase">[ Education ]</span>
           </div>
-          <h2 className="font-display font-semibold text-white text-5xl lg:text-6xl leading-tight mb-16">
+          <h2 className="font-display font-semibold text-fg text-5xl lg:text-6xl leading-tight mb-16">
             Academic<br />Foundation.
           </h2>
         </ScrollReveal>
@@ -28,7 +28,7 @@ export default function Education() {
           >
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h3 className="font-display font-semibold text-white text-2xl mb-2">
+                <h3 className="font-display font-semibold text-fg text-2xl mb-2">
                   {aboutContent.education.degree}
                 </h3>
                 <p className="font-body text-base text-fg-dim">

@@ -9,6 +9,7 @@ import './globals.css'
 import CustomCursor from '@/components/ui/CustomCursor'
 import MouseGlow from '@/components/ui/MouseGlow'
 import Meteors from '@/components/ui/Meteors'
+import { ThemeProvider } from '@/components/ui/ThemeProvider'
 import { personalInfo } from '@/data/content'
 
 const SITE_URL = 'https://ksauraj.eu.org'
@@ -139,7 +140,7 @@ const websiteLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" data-theme="dark" className="scroll-smooth">
       <head>
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
         {/* Icon fonts are decorative, not render-critical. Load them non-render-blocking
@@ -179,13 +180,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           `}</style>
         </noscript>
       </head>
-      <body className="bg-black text-white font-body antialiased cursor-none overflow-x-hidden relative">
-        <CustomCursor />
-        <MouseGlow />
-        <Meteors number={12} />
-        <div className="relative z-10">
-          {children}
-        </div>
+      <body className="bg-bg text-fg font-body antialiased cursor-none overflow-x-hidden relative">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('ksau-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}})();`,
+          }}
+        />
+        <ThemeProvider>
+          <CustomCursor />
+          <MouseGlow />
+          <Meteors number={12} />
+          <div className="relative z-10">
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )

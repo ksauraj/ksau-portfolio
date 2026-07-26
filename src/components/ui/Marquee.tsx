@@ -16,7 +16,7 @@ export default function Marquee({ items }: MarqueeProps) {
       >
         {doubled.map((item, i) => (
           <span key={i} className="font-mono text-sm text-muted tracking-widest uppercase shrink-0">
-            {item} <span className="text-white/20 mx-2">·</span>
+            {item} <span className="text-fg/20 mx-2">·</span>
           </span>
         ))}
       </motion.div>

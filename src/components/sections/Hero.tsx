@@ -37,13 +37,13 @@ export default function Hero() {
           <span className="font-mono text-xs text-muted tracking-[0.2em] uppercase">
             [ {personalInfo.role} ]
           </span>
-          <span className="font-mono text-xs text-white/70 tracking-[0.2em]">
+          <span className="font-mono text-xs text-fg/70 tracking-[0.2em]">
             @{personalInfo.handle}
           </span>
         </motion.div>
 
         <motion.h1 variants={item}
-          className="font-display font-bold text-white leading-[1.0] tracking-tight pointer-events-auto"
+          className="font-display font-bold text-fg leading-[1.0] tracking-tight pointer-events-auto"
           style={{ fontSize: 'clamp(52px, 8vw, 120px)' }}>
           Sauraj<br />Kumar Singh
         </motion.h1>
@@ -57,17 +57,17 @@ export default function Hero() {
         <motion.div variants={item} className="mt-6 h-8 pointer-events-auto">
           <TypewriterText
             phrases={heroPhrases}
-            className="font-mono text-lg text-white/80"
+            className="font-mono text-lg text-fg/80"
           />
         </motion.div>
 
         <motion.div variants={item}
           className="mt-16 flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-16 text-sm font-mono text-muted pointer-events-auto">
-          <a href={`mailto:${personalInfo.email}`} className="hover:text-white transition-colors">
+          <a href={`mailto:${personalInfo.email}`} className="hover:text-fg transition-colors">
             {personalInfo.email}
           </a>
           <a href="/resume.pdf" download
-             className="inline-flex items-center gap-2 border border-white/20 bg-white/5 hover:bg-white hover:text-black font-mono text-xs text-white px-4 py-2 transition-all duration-300 btn-glare animate-flicker-glow">
+             className="inline-flex items-center gap-2 border border-fg/20 bg-fg/5 hover:bg-fg hover:text-bg font-mono text-xs text-fg px-4 py-2 transition-all duration-300 btn-glare animate-flicker-glow">
             <span>[ Download Resume ]</span>
           </a>
         </motion.div>
@@ -78,7 +78,7 @@ export default function Hero() {
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none z-10"
         animate={{ y: [0, 8, 0] }}
         transition={{ duration: 2, repeat: Infinity }}>
-        <div className="w-px h-12 bg-gradient-to-b from-white/0 to-white/40" />
+        <div className="w-px h-12 bg-gradient-to-b from-fg/0 to-fg/40" />
       </motion.div>
     </section>
   )

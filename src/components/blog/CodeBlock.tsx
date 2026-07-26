@@ -42,8 +42,8 @@ export default function CodeBlock(
         aria-label={copied ? 'Copied' : 'Copy code'}
         className={`absolute right-2 top-2 z-10 flex items-center gap-1.5 border px-2.5 py-1 font-mono text-[11px] transition-all duration-200 ${
           copied
-            ? 'border-white/40 text-white bg-white/5'
-            : 'border-border text-white/50 hover:text-white hover:border-white/40 opacity-0 group-hover:opacity-100 focus:opacity-100'
+            ? 'border-fg/40 text-fg bg-fg/5'
+            : 'border-border text-fg/50 hover:text-fg hover:border-fg/40 opacity-0 group-hover:opacity-100 focus:opacity-100'
         }`}
       >
         {copied ? (

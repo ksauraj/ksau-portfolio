@@ -94,13 +94,13 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
-      <main className="relative min-h-screen bg-black text-white">
+      <main className="relative min-h-screen bg-bg text-fg">
         <Navbar />
         <article className="pt-40 pb-32 px-8 lg:px-16">
           <div className="max-w-3xl mx-auto">
             <Link
               href="/blog"
-              className="font-mono text-xs text-muted hover:text-white transition-colors inline-block mb-10"
+              className="font-mono text-xs text-muted hover:text-fg transition-colors inline-block mb-10"
             >
               [ ← back to blog ]
             </Link>
@@ -108,10 +108,10 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
             <header className="mb-12 border-b border-border pb-10">
               <div className="flex flex-wrap items-center gap-3 mb-6 font-mono text-xs text-muted">
                 <span>{formatDate(post.date)}</span>
-                <span className="text-white/20">·</span>
+                <span className="text-fg/20">·</span>
                 <span>{post.readingTime}</span>
               </div>
-              <h1 className="font-display font-semibold text-white text-4xl lg:text-5xl leading-tight mb-6">
+              <h1 className="font-display font-semibold text-fg text-4xl lg:text-5xl leading-tight mb-6">
                 {post.title}
               </h1>
               <p className="font-body text-lg text-muted leading-relaxed mb-6">
