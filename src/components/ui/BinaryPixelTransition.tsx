@@ -11,7 +11,8 @@ interface BinaryPixelTransitionProps {
 
 const MIN_DURATION = 2500
 const MAX_DURATION = 3000
-const CELL_SIZE = 11
+const DESKTOP_CELL_SIZE = 11
+const MOBILE_CELL_SIZE = 16
 
 export default function BinaryPixelTransition({ active, theme, origin, onComplete }: BinaryPixelTransitionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -37,9 +38,11 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
       getComputedStyle(document.documentElement).getPropertyValue('--theme-transition-duration'),
     )
     const duration = Math.min(MAX_DURATION, Math.max(MIN_DURATION, requestedDuration || 2750))
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
     const width = window.innerWidth
     const height = window.innerHeight
+    const isMobile = window.matchMedia('(max-width: 768px), (pointer: coarse)').matches
+    const CELL_SIZE = isMobile ? MOBILE_CELL_SIZE : DESKTOP_CELL_SIZE
+    const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5)
     const originX = origin?.x ?? width / 2
     const originY = origin?.y ?? 32
     const columns = Math.ceil(width / CELL_SIZE) + 1
@@ -57,7 +60,13 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
     context.textAlign = 'center'
     context.textBaseline = 'middle'
 
+    let lastFrameAt = 0
     const draw = (now: number) => {
+      if (isMobile && now - lastFrameAt < 1000 / 30) {
+        frame = requestAnimationFrame(draw)
+        return
+      }
+      lastFrameAt = now
       const progress = Math.min((now - startedAt) / duration, 1)
       const maxRadius = Math.hypot(
         Math.max(originX, width - originX),

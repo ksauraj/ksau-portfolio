@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import BinaryPixelTransition from '@/components/ui/BinaryPixelTransition'
 
 type Theme = 'dark' | 'light'
-type ThemeContextValue = { theme: Theme; toggleTheme: (source?: HTMLElement) => void }
+type ThemeContextValue = { theme: Theme; toggleTheme: (origin?: { x: number; y: number }) => void }
 type TransitionState = { theme: Theme; origin: { x: number; y: number } }
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
@@ -31,12 +31,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     meta.content = color
   }, [theme])
 
-  const toggleTheme = useCallback((source?: HTMLElement) => {
+  const toggleTheme = useCallback((pointerOrigin?: { x: number; y: number }) => {
     const next = theme === 'dark' ? 'light' : 'dark'
-    const rect = source?.getBoundingClientRect()
-    const origin = {
-      x: rect ? rect.left + rect.width / 2 : window.innerWidth / 2,
-      y: rect ? rect.top + rect.height / 2 : 32,
+    const origin = pointerOrigin ?? {
+      x: window.innerWidth / 2,
+      y: 32,
     }
     const applyTheme = () => {
       setTheme(next)

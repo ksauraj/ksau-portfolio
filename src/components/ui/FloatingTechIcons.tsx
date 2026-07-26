@@ -179,6 +179,7 @@ export default function FloatingTechIcons({ terminalRect }: Props) {
       const container = containerRef.current
       if (!container || nodesRef.current.length === 0) { rafRef.current = requestAnimationFrame(tick); return }
       const rect = container.getBoundingClientRect()
+      const themeGlow = getComputedStyle(document.documentElement).getPropertyValue('--theme-glow').trim().replace(/\s+/g, ',') || '255,255,255'
       const w = rect.width
       const h = rect.height
       const pad = NODE_SIZE / 2
@@ -296,7 +297,7 @@ export default function FloatingTechIcons({ terminalRect }: Props) {
           el.style.opacity = String(Math.min(0.85, 0.08 + glowAlpha * 0.42 + proximityBoost))
           const si = Math.min(1, glowAlpha + proximityBoost * 1.4)
           el.style.filter = si > 0.05
-            ? `drop-shadow(0 0 ${Math.round(si * 14)}px rgba(255,255,255,${(si * 0.7).toFixed(2)}))`
+            ? `drop-shadow(0 0 ${Math.round(si * 14)}px rgba(${themeGlow},${(si * 0.7).toFixed(2)}))`
             : 'none'
         }
 
@@ -324,7 +325,7 @@ export default function FloatingTechIcons({ terminalRect }: Props) {
             position: 'absolute', left: 0, top: 0,
             width: `${NODE_SIZE}px`, height: `${NODE_SIZE}px`,
             willChange: 'transform, opacity, filter',
-            opacity: 0.08, color: 'white',
+            opacity: 0.08, color: 'rgb(var(--color-fg))',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             pointerEvents: 'none',
           }}
