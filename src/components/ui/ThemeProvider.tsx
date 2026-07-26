@@ -38,6 +38,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       window.localStorage.setItem('ksau-theme', next)
     }
 
+    const transitionDuration = 2500 + Math.random() * 500
+    document.documentElement.style.setProperty('--theme-transition-duration', `${transitionDuration}ms`)
+
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const doc = document as Document & {
       startViewTransition?: (callback: () => void) => { finished: Promise<void> }

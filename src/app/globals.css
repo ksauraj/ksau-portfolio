@@ -60,13 +60,15 @@ html:active-view-transition article {
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 1450ms;
+  animation-duration: var(--theme-transition-duration, 2750ms);
   animation-timing-function: linear;
   mix-blend-mode: normal;
 }
 
 ::view-transition-old(root) { animation-name: none; }
 ::view-transition-new(root) { animation-name: theme-reveal-wave; }
+
+html[data-theme='light'] .footer-portrait { filter: grayscale(1) contrast(1.1) invert(1); }
 
 .binary-pixel-transition {
   position: fixed; inset: 0; z-index: 10000; pointer-events: none;
