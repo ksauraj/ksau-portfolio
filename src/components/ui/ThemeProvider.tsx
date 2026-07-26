@@ -24,6 +24,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  useEffect(() => {
+    const color = theme === 'light' ? '#f6f7f9' : '#000000'
+    let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+    if (!meta) {
+      meta = document.createElement('meta')
+      meta.name = 'theme-color'
+      document.head.appendChild(meta)
+    }
+    meta.content = color
+  }, [theme])
+
   const toggleTheme = useCallback(() => {
     const next = theme === 'dark' ? 'light' : 'dark'
     setBits(binaryStream())

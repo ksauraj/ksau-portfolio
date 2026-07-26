@@ -350,6 +350,14 @@ html[data-theme='light'] .bg-\[\#050505\] { background-color: rgb(var(--color-su
 html[data-theme='light'] .animate-flicker-glow,
 html[data-theme='light'] .animate-tile-flicker { animation-name: none; }
 
+/* The interactive skills terminal intentionally stays a dark terminal in both modes. */
+html[data-theme='light'] #skills [style*="background"] {
+  --color-fg: 255 255 255;
+  --color-bg: 0 0 0;
+}
+html[data-theme='light'] #skills .bg-card,
+html[data-theme='light'] #skills .bg-surface { color: #fff; }
+
 /* ============================================================
    Blog code-block copy glare — one-shot sweep on successful copy.
    Mirrors the site's card-glare / btn-glare aesthetic.

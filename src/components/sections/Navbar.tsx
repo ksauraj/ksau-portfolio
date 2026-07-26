@@ -97,8 +97,9 @@ export default function Navbar() {
           type="button"
           onClick={toggleTheme}
           aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          aria-pressed={theme === 'light'}
           title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-fg hover:border-border-hover transition-colors"
+          className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-fg hover:border-border-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fg/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg transition-colors"
         >
           {theme === 'dark' ? <Sun size={17} aria-hidden="true" /> : <Moon size={17} aria-hidden="true" />}
         </button>
