@@ -16,7 +16,15 @@ export default function Footer() {
           fill
           priority
           sizes="(max-width: 1024px) 0vw, 38vw"
-          className="footer-portrait object-cover object-top grayscale contrast-110"
+          className="footer-portrait footer-portrait-dark object-cover object-top grayscale contrast-110"
+        />
+        <Image
+          src="/sauraj-light.jpg"
+          alt={`${personalInfo.name} — ${personalInfo.role}`}
+          fill
+          priority
+          sizes="(max-width: 1024px) 0vw, 38vw"
+          className="footer-portrait footer-portrait-light object-cover object-[65%_25%]"
         />
       </div>
 

@@ -20,7 +20,7 @@ export default function MouseGlow() {
       style={{
         x: springX,
         y: springY,
-        background: 'radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgb(var(--theme-glow) / 0.06) 0%, transparent 70%)',
       }}
     />
   )

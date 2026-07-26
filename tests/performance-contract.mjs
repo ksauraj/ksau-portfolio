@@ -16,5 +16,6 @@ assert.match(css, /content-visibility:\s*auto/, 'off-screen sections skip render
 assert.match(css, /prefers-reduced-motion:\s*reduce/, 'reduced motion remains supported')
 assert.match(socials, /--color-fg/, 'social connection lines follow the active theme')
 assert.match(doodles, /stroke-current text-fg/, 'background doodles follow the active theme')
-assert.match(css, /footer-portrait.*invert\(1\)/, 'light mode portrait inversion is available for contrast')
+assert.doesNotMatch(css, /footer-portrait.*invert\(1\)/, 'footer portraits avoid inversion filters')
+assert.match(footer, /footer-portrait-light/, 'light mode uses a dedicated portrait asset')
 console.log('performance and matrix transition contract: ok')

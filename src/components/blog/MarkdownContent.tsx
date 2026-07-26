@@ -50,7 +50,7 @@ const components = {
 }
 
 const prettyCodeOptions = {
-  theme: 'github-dark',
+  theme: { dark: 'github-dark', light: 'github-light' },
   keepBackground: false,
 }
 

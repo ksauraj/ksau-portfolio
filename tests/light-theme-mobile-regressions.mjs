@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict'
+import { existsSync, readFileSync } from 'node:fs'
+
+const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')
+const css = read('src/app/globals.css')
+const navbar = read('src/components/sections/Navbar.tsx')
+const provider = read('src/components/ui/ThemeProvider.tsx')
+const transition = read('src/components/ui/BinaryPixelTransition.tsx')
+const terminal = read('src/components/ui/TerminalSkills.tsx')
+const footer = read('src/components/sections/Footer.tsx')
+
+assert.doesNotMatch(css, /html\[data-theme='light'\] \.animate-flicker-glow,[\s\S]{0,120}animation-name:\s*none/, 'light mode must not disable glare animations')
+assert.match(css, /rgb\(var\(--theme-glow\)\s*\/\s*0\.2\)/, 'button glare uses the active theme glow color')
+assert.match(css, /card-hover-glare[\s\S]*rgb\(var\(--theme-glow\)/, 'card glare uses the active theme glow color')
+assert.match(css, /html\[data-theme='light'\] \.skills-terminal[\s\S]*filter:\s*invert\(1\)/, 'the monochrome skills terminal becomes light in light mode')
+assert.match(terminal, /className="skills-terminal"/, 'skills terminal exposes a scoped light-mode surface')
+assert.match(navbar, /toggleTheme\(\{\s*x:\s*event\.clientX,\s*y:\s*event\.clientY\s*\}\)/, 'ripple starts at the actual pointer coordinates')
+assert.doesNotMatch(provider, /getBoundingClientRect/, 'ripple origin no longer depends on a potentially stale element rectangle')
+assert.match(transition, /isMobile.*CELL_SIZE/s, 'mobile transition uses a lower-density grid')
+assert.match(transition, /now - lastFrameAt < 1000 \/ 30/, 'mobile transition caps canvas work at 30fps')
+assert.match(footer, /sauraj-light\.jpg/, 'footer includes the supplied light-mode portrait')
+assert.match(footer, /footer-portrait-light/, 'footer exposes a theme-specific light portrait')
+assert.doesNotMatch(css, /footer-portrait[^\n]*invert\(1\)/, 'footer portrait is never inverted')
+assert.ok(existsSync(new URL('../public/sauraj-light.jpg', import.meta.url)), 'supplied portrait is copied into public assets')
+console.log('light theme and mobile ripple regression contract: ok')

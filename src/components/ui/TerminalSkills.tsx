@@ -1336,7 +1336,7 @@ export default function TerminalSkills() {
         }
       `}</style>
 
-      <div ref={terminalContainerRef} role="region" aria-label="Skills terminal" style={{ background: '#000', border: '1px solid #2a2a2a', borderRadius: '10px', overflow: 'hidden', fontFamily: 'monospace', position: 'relative' }}>
+      <div ref={terminalContainerRef} role="region" aria-label="Skills terminal" className="skills-terminal" style={{ background: '#000', border: '1px solid #2a2a2a', borderRadius: '10px', overflow: 'hidden', fontFamily: 'monospace', position: 'relative' }}>
 
         {/* Title bar */}
         <div style={{ background: '#0d0d0d', borderBottom: '1px solid #151515', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
