@@ -32,17 +32,32 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = useCallback(() => {
     const next = theme === 'dark' ? 'light' : 'dark'
+    const applyTheme = () => {
+      setTheme(next)
+      document.documentElement.dataset.theme = next
+      window.localStorage.setItem('ksau-theme', next)
+    }
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const doc = document as Document & {
+      startViewTransition?: (callback: () => void) => { finished: Promise<void> }
+    }
+
+    if (reducedMotion || !doc.startViewTransition) {
+      applyTheme()
+      return
+    }
+
     setTransitionTheme(next)
-    setTheme(next)
-    document.documentElement.dataset.theme = next
-    window.localStorage.setItem('ksau-theme', next)
+    const viewTransition = doc.startViewTransition(applyTheme)
+    viewTransition.finished.finally(() => setTransitionTheme(null))
   }, [theme])
 
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme])
   return (
     <ThemeContext.Provider value={value}>
       {children}
-      <BinaryPixelTransition active={transitionTheme !== null} theme={transitionTheme ?? theme} onComplete={() => setTransitionTheme(null)} />
+      <BinaryPixelTransition active={transitionTheme !== null} theme={transitionTheme ?? theme} />
     </ThemeContext.Provider>
   )
 }

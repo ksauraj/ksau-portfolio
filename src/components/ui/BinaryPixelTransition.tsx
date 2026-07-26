@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react'
 interface BinaryPixelTransitionProps {
   active: boolean
   theme: 'dark' | 'light'
-  onComplete: () => void
+  onComplete?: () => void
 }
 
 const DURATION = 1450
@@ -25,7 +25,7 @@ export default function BinaryPixelTransition({ active, theme, onComplete }: Bin
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reducedMotion) {
-      completeRef.current()
+      completeRef.current?.()
       return
     }
 
@@ -75,7 +75,7 @@ export default function BinaryPixelTransition({ active, theme, onComplete }: Bin
       if (progress < 1) frame = requestAnimationFrame(draw)
       else {
         context.clearRect(0, 0, width, height)
-        completeRef.current()
+        completeRef.current?.()
       }
     }
 

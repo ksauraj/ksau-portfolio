@@ -36,12 +36,37 @@ html[data-theme='light'] {
 html, body { background: rgb(var(--color-bg)); color: rgb(var(--color-fg)); }
 body, main, section, nav, article { transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease; }
 
+/* The View Transition is the color boundary: keep the old theme below the wave
+   and reveal the new theme only in the portion it has crossed. */
+html:active-view-transition body,
+html:active-view-transition main,
+html:active-view-transition section,
+html:active-view-transition nav,
+html:active-view-transition article {
+  transition: none;
+}
+
 @supports (content-visibility: auto) {
   section:not(#home) {
     content-visibility: auto;
     contain-intrinsic-size: auto 900px;
   }
 }
+
+@keyframes theme-reveal-wave {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 1450ms;
+  animation-timing-function: linear;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) { animation-name: none; }
+::view-transition-new(root) { animation-name: theme-reveal-wave; }
 
 .binary-pixel-transition {
   position: fixed; inset: 0; z-index: 10000; pointer-events: none;
