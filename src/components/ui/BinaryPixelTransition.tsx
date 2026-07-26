@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react'
 interface BinaryPixelTransitionProps {
   active: boolean
   theme: 'dark' | 'light'
+  origin?: { x: number; y: number }
   onComplete?: () => void
 }
 
@@ -12,7 +13,7 @@ const MIN_DURATION = 2500
 const MAX_DURATION = 3000
 const CELL_SIZE = 11
 
-export default function BinaryPixelTransition({ active, theme, onComplete }: BinaryPixelTransitionProps) {
+export default function BinaryPixelTransition({ active, theme, origin, onComplete }: BinaryPixelTransitionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const completeRef = useRef(onComplete)
   completeRef.current = onComplete
@@ -39,14 +40,13 @@ export default function BinaryPixelTransition({ active, theme, onComplete }: Bin
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
     const width = window.innerWidth
     const height = window.innerHeight
+    const originX = origin?.x ?? width / 2
+    const originY = origin?.y ?? 32
     const columns = Math.ceil(width / CELL_SIZE) + 1
     const rows = Math.ceil(height / CELL_SIZE) + 1
     const bits = new Uint8Array(columns * rows)
     for (let i = 0; i < bits.length; i++) bits[i] = Math.random() > 0.5 ? 1 : 0
 
-    const trailLengths = Array.from({ length: columns }, () =>
-      width <= 768 ? 18 + Math.floor(Math.random() * 8) : rows,
-    )
 
     canvas.width = Math.ceil(width * dpr)
     canvas.height = Math.ceil(height * dpr)
@@ -59,22 +59,26 @@ export default function BinaryPixelTransition({ active, theme, onComplete }: Bin
 
     const draw = (now: number) => {
       const progress = Math.min((now - startedAt) / duration, 1)
-      const waveY = -height * 0.15 + progress * height * 1.3
-      const waveWidth = Math.max(95, height * 0.13)
+      const maxRadius = Math.hypot(
+        Math.max(originX, width - originX),
+        Math.max(originY, height - originY),
+      )
+      const waveRadius = progress * maxRadius
+      const waveWidth = Math.max(CELL_SIZE * 3, Math.min(120, maxRadius * 0.12))
       context.clearRect(0, 0, width, height)
 
-      const isSmallScreen = width <= 768
-      const waveRow = Math.floor(waveY / CELL_SIZE)
       for (let row = 0; row < rows; row++) {
         const y = row * CELL_SIZE + CELL_SIZE / 2
-        const distance = Math.abs(y - waveY)
-        const waveGlow = Math.max(0, 1 - distance / waveWidth)
-        const baseAlpha = 0.035 + waveGlow * 0.9
-        if (baseAlpha < 0.045) continue
         for (let column = 0; column < columns; column++) {
-          const trailStart = waveRow - trailLengths[column] + 1
-          if (isSmallScreen && (row < trailStart || row > waveRow)) continue
           const x = column * CELL_SIZE + CELL_SIZE / 2
+          const distance = Math.hypot(x - originX, y - originY)
+          // Keep glyphs behind the reveal boundary: the new background arrives
+          // first, then the binary crest follows it like the wake of a ripple.
+          const distanceToWave = waveRadius - distance
+          if (distanceToWave < 0 || distanceToWave > waveWidth) continue
+          const waveGlow = Math.sin((distanceToWave / waveWidth) * Math.PI)
+          const baseAlpha = 0.035 + waveGlow * 0.9
+          if (baseAlpha < 0.045) continue
           const bit = bits[row * columns + column]
           const shimmer = ((column * 17 + row * 31) % 7) / 7
           const alpha = Math.min(0.98, baseAlpha * (0.68 + shimmer * 0.32))
@@ -94,7 +98,7 @@ export default function BinaryPixelTransition({ active, theme, onComplete }: Bin
 
     frame = requestAnimationFrame(draw)
     return () => cancelAnimationFrame(frame)
-  }, [active, theme])
+  }, [active, theme, origin?.x, origin?.y])
 
   if (!active) return null
   return <canvas ref={canvasRef} aria-hidden="true" className="binary-pixel-transition" />

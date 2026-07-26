@@ -4,12 +4,13 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import BinaryPixelTransition from '@/components/ui/BinaryPixelTransition'
 
 type Theme = 'dark' | 'light'
-type ThemeContextValue = { theme: Theme; toggleTheme: () => void }
+type ThemeContextValue = { theme: Theme; toggleTheme: (source?: HTMLElement) => void }
+type TransitionState = { theme: Theme; origin: { x: number; y: number } }
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('dark')
-  const [transitionTheme, setTransitionTheme] = useState<Theme | null>(null)
+  const [transition, setTransition] = useState<TransitionState | null>(null)
 
   useEffect(() => {
     const stored = window.localStorage.getItem('ksau-theme')
@@ -30,8 +31,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     meta.content = color
   }, [theme])
 
-  const toggleTheme = useCallback(() => {
+  const toggleTheme = useCallback((source?: HTMLElement) => {
     const next = theme === 'dark' ? 'light' : 'dark'
+    const rect = source?.getBoundingClientRect()
+    const origin = {
+      x: rect ? rect.left + rect.width / 2 : window.innerWidth / 2,
+      y: rect ? rect.top + rect.height / 2 : 32,
+    }
     const applyTheme = () => {
       setTheme(next)
       document.documentElement.dataset.theme = next
@@ -40,6 +46,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const transitionDuration = 2500 + Math.random() * 500
     document.documentElement.style.setProperty('--theme-transition-duration', `${transitionDuration}ms`)
+    document.documentElement.style.setProperty('--theme-origin-x', `${origin.x}px`)
+    document.documentElement.style.setProperty('--theme-origin-y', `${origin.y}px`)
+    const revealRadius = Math.hypot(
+      Math.max(origin.x, window.innerWidth - origin.x),
+      Math.max(origin.y, window.innerHeight - origin.y),
+    )
+    document.documentElement.style.setProperty('--theme-reveal-radius', `${revealRadius}px`)
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const doc = document as Document & {
@@ -51,16 +64,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    setTransitionTheme(next)
+    setTransition({ theme: next, origin })
     const viewTransition = doc.startViewTransition(applyTheme)
-    viewTransition.finished.finally(() => setTransitionTheme(null))
+    viewTransition.finished.finally(() => setTransition(null))
   }, [theme])
 
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme])
   return (
     <ThemeContext.Provider value={value}>
       {children}
-      <BinaryPixelTransition active={transitionTheme !== null} theme={transitionTheme ?? theme} />
+      <BinaryPixelTransition active={transition !== null} theme={transition?.theme ?? theme} origin={transition?.origin} />
     </ThemeContext.Provider>
   )
 }
