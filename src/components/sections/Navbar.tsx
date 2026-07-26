@@ -95,7 +95,7 @@ export default function Navbar() {
       <div className="flex items-center gap-3">
         <button
           type="button"
-          onClick={toggleTheme}
+          onClick={(event) => toggleTheme(event.currentTarget)}
           aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           aria-pressed={theme === 'light'}
           title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}

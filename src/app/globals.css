@@ -36,8 +36,8 @@ html[data-theme='light'] {
 html, body { background: rgb(var(--color-bg)); color: rgb(var(--color-fg)); }
 body, main, section, nav, article { transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease; }
 
-/* The View Transition is the color boundary: keep the old theme below the wave
-   and reveal the new theme only in the portion it has crossed. */
+/* The View Transition is the color boundary: the new theme expands outward
+   from the mode toggle while the old theme remains static ahead of the wave. */
 html:active-view-transition body,
 html:active-view-transition main,
 html:active-view-transition section,
@@ -54,8 +54,8 @@ html:active-view-transition article {
 }
 
 @keyframes theme-reveal-wave {
-  from { clip-path: inset(0 0 100% 0); }
-  to { clip-path: inset(0 0 0 0); }
+  from { clip-path: circle(0px at var(--theme-origin-x) var(--theme-origin-y)); }
+  to { clip-path: circle(var(--theme-reveal-radius) at var(--theme-origin-x) var(--theme-origin-y)); }
 }
 
 ::view-transition-old(root),
