@@ -33,32 +33,32 @@ function FloatingDoodlesComponent({ count = 24, isFastGlow = false }: { count?: 
     switch (type) {
       case 0:
         return (
-          <svg className="w-8 h-8 stroke-white fill-none" viewBox="0 0 24 24" strokeWidth="1.5">
+          <svg className="w-8 h-8 stroke-current text-fg fill-none" viewBox="0 0 24 24" strokeWidth="1.5">
             <line x1="12" y1="4" x2="12" y2="20" />
             <line x1="4" y1="12" x2="20" y2="12" />
           </svg>
         )
       case 1:
         return (
-          <svg className="w-6 h-6 stroke-white fill-none" viewBox="0 0 24 24" strokeWidth="1.5">
+          <svg className="w-6 h-6 stroke-current text-fg fill-none" viewBox="0 0 24 24" strokeWidth="1.5">
             <circle cx="12" cy="12" r="8" />
           </svg>
         )
       case 2:
         return (
-          <svg className="w-6 h-6 stroke-white fill-none" viewBox="0 0 24 24" strokeWidth="1.5">
+          <svg className="w-6 h-6 stroke-current text-fg fill-none" viewBox="0 0 24 24" strokeWidth="1.5">
             <polygon points="12,4 4,20 20,20" />
           </svg>
         )
       case 3:
         return (
-          <svg className="w-10 h-6 stroke-white fill-none" viewBox="0 0 40 20" strokeWidth="1.5">
+          <svg className="w-10 h-6 stroke-current text-fg fill-none" viewBox="0 0 40 20" strokeWidth="1.5">
             <path d="M5 10 Q 12 4, 20 10 T 35 10" />
           </svg>
         )
       case 4:
         return (
-          <svg className="w-8 h-8 stroke-white fill-none" viewBox="0 0 24 24" strokeWidth="1.5">
+          <svg className="w-8 h-8 stroke-current text-fg fill-none" viewBox="0 0 24 24" strokeWidth="1.5">
             <path d="M8 4 H4 V20 H8" />
             <path d="M16 4 H20 V20 H16" />
           </svg>

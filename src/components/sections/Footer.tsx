@@ -16,7 +16,7 @@ export default function Footer() {
           fill
           priority
           sizes="(max-width: 1024px) 0vw, 38vw"
-          className="object-cover object-top grayscale contrast-110"
+          className="footer-portrait object-cover object-top grayscale contrast-110"
         />
       </div>
 

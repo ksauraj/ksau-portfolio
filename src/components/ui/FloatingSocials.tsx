@@ -312,7 +312,9 @@ export default function FloatingSocials() {
                   lineWidth = Math.max(lineWidth, 0.5 + (match.alpha / animationConfig.socials.randomGlowIntensity) * 1.0)
                 }
 
-                ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`
+                const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--color-fg').trim()
+                const [r, g, b] = themeColor.split(/\s+/).map(Number)
+                ctx.strokeStyle = `rgba(${r || 255}, ${g || 255}, ${b || 255}, ${alpha})`
                 ctx.lineWidth = lineWidth
                 ctx.beginPath()
                 ctx.moveTo(n1.x, n1.y)
