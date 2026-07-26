@@ -232,10 +232,20 @@
 .prose-blog pre code [data-line] { padding: 0 0.25rem; }
 
 /* Tables (GFM) */
+.prose-blog .table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+  border: 1px solid #1A1A1A;
+  border-radius: 0.5rem;
+}
 .prose-blog table {
   width: 100%; border-collapse: collapse; font-size: 0.9rem;
   font-family: 'Inter', sans-serif;
+  min-width: 34rem;
 }
+.prose-blog .table-scroll > table { margin: 0; }
 .prose-blog th, .prose-blog td {
   border: 1px solid #1A1A1A; padding: 0.6rem 0.9rem; text-align: left;
 }

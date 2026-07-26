@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
 
 export default function CustomCursor() {
@@ -10,14 +10,34 @@ export default function CustomCursor() {
   const outerX = useSpring(mouseX, { stiffness: 150, damping: 20 })
   const outerY = useSpring(mouseY, { stiffness: 150, damping: 20 })
 
+  // Only enable the custom cursor on devices with a fine pointer (mouse/trackpad)
+  // and a wide enough screen — never on phones/tablets/touch.
+  const [enabled, setEnabled] = useState(false)
   useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px) and (pointer: fine)')
+    const update = () => {
+      setEnabled(mq.matches)
+      document.body.classList.toggle('cursor-none', mq.matches)
+    }
+    update()
+    mq.addEventListener('change', update)
+    return () => {
+      mq.removeEventListener('change', update)
+      document.body.classList.remove('cursor-none')
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!enabled) return
     const move = (e: MouseEvent) => {
       mouseX.set(e.clientX)
       mouseY.set(e.clientY)
     }
     window.addEventListener('mousemove', move)
     return () => window.removeEventListener('mousemove', move)
-  }, [mouseX, mouseY])
+  }, [enabled, mouseX, mouseY])
+
+  if (!enabled) return null
 
   return (
     <>
