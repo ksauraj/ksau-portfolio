@@ -43,49 +43,13 @@ body, main, section, nav, article { transition: background-color 240ms ease, col
   }
 }
 
-@keyframes theme-rain {
-  0% { transform: translate3d(0, -130%, 0); opacity: 0; }
-  12% { opacity: .78; }
-  72% { opacity: .48; }
-  100% { transform: translate3d(0, 145%, 0); opacity: 0; }
-}
-
-@keyframes theme-glare-fall {
-  0% { transform: translate3d(0, -120%, 0); opacity: 0; }
-  16% { opacity: 1; }
-  100% { transform: translate3d(0, 155%, 0); opacity: 0; }
-}
-
-.theme-transition { position: fixed; inset: 0; z-index: 10000; pointer-events: none; overflow: hidden; contain: strict; }
-.theme-transition--idle { display: none; }
-.theme-transition__glare {
-  position: absolute; top: -22%; left: 0; width: 100%; height: 34%;
-  background: linear-gradient(180deg, transparent, rgb(var(--color-fg) / .06) 34%, rgb(var(--color-fg) / .22) 72%, transparent);
-  box-shadow: 0 20px 52px rgb(var(--theme-glow) / .11);
-  transform: translate3d(0, -120%, 0);
-  animation: theme-glare-fall 1.2s cubic-bezier(.22, 1, .36, 1) both;
-  will-change: transform, opacity;
-}
-.theme-transition__rain {
-  position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, 1fr);
-  gap: clamp(6px, 1.5vw, 24px); padding: 0 4vw; overflow: hidden;
-  color: rgb(var(--color-fg) / .44); font: 700 clamp(9px, .9vw, 12px)/1.45 'Space Mono', monospace;
-  text-align: center; mix-blend-mode: difference;
-}
-.theme-transition__rain span {
-  display: block; word-spacing: 100vw; white-space: normal;
-  transform: translate3d(0, -130%, 0);
-  animation: theme-rain 1.2s linear both;
-  will-change: transform, opacity;
-}
-
-@media (max-width: 640px) {
-  .theme-transition__rain { grid-template-columns: repeat(8, 1fr); }
-  .theme-transition__rain span:nth-child(n + 9) { display: none; }
+.binary-pixel-transition {
+  position: fixed; inset: 0; z-index: 10000; pointer-events: none;
+  width: 100vw; height: 100vh; contain: strict;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .theme-transition__glare, .theme-transition__rain { display: none; }
+  .binary-pixel-transition { display: none; }
   body, main, section, nav, article { transition-duration: 0.01ms; }
 }
 
