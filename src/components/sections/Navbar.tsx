@@ -6,7 +6,7 @@ import { Moon, Sun } from 'lucide-react'
 import { useTheme } from '@/components/ui/ThemeProvider'
 import { personalInfo } from '@/data/content'
 
-const links = ['Home', 'Skills', 'Experience', 'Projects', 'Education']
+const links = ['Home', 'Skills', 'Experience', 'Projects', 'Blog']
 const sectionId = (link: string) => link.replace(/[^a-z]/gi, '').toLowerCase()
 
 export default function Navbar() {
