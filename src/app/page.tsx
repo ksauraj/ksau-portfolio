@@ -5,7 +5,7 @@ import Skills from '@/components/sections/Skills'
 import Experience from '@/components/sections/Experience'
 import Projects from '@/components/sections/Projects'
 import OpenSource from '@/components/sections/OpenSource'
-import Education from '@/components/sections/Education'
+import LatestBlogs from '@/components/sections/LatestBlogs'
 import Footer from '@/components/sections/Footer'
 import Loader from '@/components/ui/Loader'
 import ResponsiveNotice from '@/components/ui/ResponsiveNotice'
@@ -23,7 +23,7 @@ export default function Home() {
         <Experience />
         <Projects />
         <OpenSource />
-        <Education />
+        <LatestBlogs />
         <Footer />
       </main>
     </>

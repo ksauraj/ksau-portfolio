@@ -33,11 +33,11 @@ export default function Hero() {
         className="max-w-6xl w-full relative z-10 pointer-events-none"
       >
         <motion.div variants={item}
-          className="inline-flex items-center gap-3 border border-border px-3 py-1.5 mb-8 pointer-events-auto">
-          <span className="font-mono text-xs text-muted tracking-[0.2em] uppercase">
+          className="flex flex-wrap gap-x-3 gap-y-1.5 border border-border px-3 py-1.5 mb-8 pointer-events-auto max-w-full">
+          <span className="font-mono text-xs text-muted tracking-[0.15em] uppercase whitespace-nowrap">
             [ {personalInfo.role} ]
           </span>
-          <span className="font-mono text-xs text-fg/70 tracking-[0.2em]">
+          <span className="font-mono text-xs text-fg/70 tracking-[0.15em] whitespace-nowrap">
             @{personalInfo.handle}
           </span>
         </motion.div>
