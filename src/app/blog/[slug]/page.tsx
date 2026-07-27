@@ -2,8 +2,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Navbar from '@/components/sections/Navbar'
-import Footer from '@/components/sections/Footer'
 import { MarkdownContent } from '@/components/blog/MarkdownContent'
+import ShareButton from '@/components/blog/ShareButton'
+import ViewCounter from '@/components/blog/ViewCounter'
+import RelatedPosts from '@/components/blog/RelatedPosts'
 import { getAllPostSlugs, getPostBySlug } from '@/lib/blog'
 import { formatDate } from '@/lib/date'
 
@@ -96,7 +98,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
       />
       <main className="relative min-h-screen bg-bg text-fg">
         <Navbar />
-        <article className="pt-40 pb-32 px-8 lg:px-16">
+        <article className="pt-40 pb-16 px-8 lg:px-16">
           <div className="max-w-3xl mx-auto">
             <Link
               href="/blog"
@@ -110,11 +112,24 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
                 <span>{formatDate(post.date)}</span>
                 <span className="text-fg/20">·</span>
                 <span>{post.readingTime}</span>
+                <span className="text-fg/20 hidden sm:inline">·</span>
+                <span className="hidden sm:inline">
+                  <ViewCounter slug={post.slug} />
+                </span>
+                <span className="ml-auto">
+                  <ShareButton url={url} title={post.title} />
+                </span>
               </div>
-              <h1 className="font-display font-semibold text-fg text-4xl lg:text-5xl leading-tight mb-6">
+
+              {/* Mobile view counter */}
+              <div className="sm:hidden mb-4 font-mono text-xs text-muted">
+                <ViewCounter slug={post.slug} />
+              </div>
+
+              <h1 className="font-display font-semibold text-fg text-3xl sm:text-4xl lg:text-5xl leading-tight mb-6">
                 {post.title}
               </h1>
-              <p className="font-body text-lg text-muted leading-relaxed mb-6">
+              <p className="font-body text-base sm:text-lg text-muted leading-relaxed mb-6">
                 {post.excerpt}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -134,7 +149,9 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
             </div>
           </div>
         </article>
-        <Footer />
+
+        {/* Recommendations — replaces the normal footer on blog pages */}
+        <RelatedPosts currentSlug={post.slug} currentTags={post.tags} />
       </main>
     </>
   )
