@@ -60,6 +60,9 @@ export default function Mermaid({ chart }: { chart: string }) {
   const [scale, setScale] = useState(1)
   const [tx, setTx] = useState(0)
   const [ty, setTy] = useState(0)
+  const [copiedDiagram, setCopiedDiagram] = useState(false)
+  const [glareDiagram, setGlareDiagram] = useState(false)
+  const diagramTimer = useRef<ReturnType<typeof setTimeout>>()
   const dragging = useRef(false)
   const last = useRef({ x: 0, y: 0 })
   const pinch = useRef<{ dist: number; scale: number } | null>(null)
@@ -97,6 +100,20 @@ export default function Mermaid({ chart }: { chart: string }) {
     setTx(0)
     setTy(0)
   }, [])
+  const copyDiagram = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(chart)
+    } catch {
+      return
+    }
+    setCopiedDiagram(true)
+    setGlareDiagram(true)
+    clearTimeout(diagramTimer.current)
+    diagramTimer.current = setTimeout(() => {
+      setGlareDiagram(false)
+      setCopiedDiagram(false)
+    }, 1500)
+  }, [chart])
 
   // Wheel: ctrl/cmd+wheel or trackpad pinch → zoom; plain wheel scrolls page.
   const onWheel = useCallback((e: React.WheelEvent) => {
@@ -168,6 +185,29 @@ export default function Mermaid({ chart }: { chart: string }) {
           </span>
           <ToolBtn label="Zoom in" onClick={() => zoomBy(1.2)}>+</ToolBtn>
           <ToolBtn label="Reset view" onClick={reset}>⟲</ToolBtn>
+          <div className="w-px h-5 bg-border mx-1" />
+          <ToolBtn
+            label={copiedDiagram ? 'Copied' : 'Copy diagram'}
+            onClick={copyDiagram}
+            className="relative overflow-hidden"
+          >
+            {copiedDiagram ? '✓' : (
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            )}
+            {glareDiagram && (
+              <span
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(105deg, transparent 0%, rgb(255 255 255 / 0.08) 30%, rgb(255 255 255 / 0.18) 50%, rgb(255 255 255 / 0.08) 70%, transparent 100%)',
+                  transform: 'skewX(-20deg)',
+                  animation: 'copy-sweep 0.7s ease-out forwards',
+                }}
+              />
+            )}
+          </ToolBtn>
         </div>
       </div>
 
@@ -219,17 +259,19 @@ function ToolBtn({
   children,
   onClick,
   label,
+  className = '',
 }: {
   children: React.ReactNode
   onClick: () => void
   label: string
+  className?: string
 }) {
   return (
     <button
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="w-7 h-7 grid place-items-center border border-border text-fg/70 hover:text-fg hover:border-fg/40 font-mono text-sm transition-colors"
+      className={`w-7 h-7 grid place-items-center border border-border text-fg/70 hover:text-fg hover:border-fg/40 font-mono text-sm transition-colors ${className}`}
     >
       {children}
     </button>

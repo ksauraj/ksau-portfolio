@@ -33,7 +33,7 @@ export default function Hero() {
         className="max-w-6xl w-full relative z-10 pointer-events-none"
       >
         <motion.div variants={item}
-          className="flex flex-wrap gap-x-3 gap-y-1.5 border border-border px-3 py-1.5 mb-8 pointer-events-auto max-w-full">
+          className="inline-flex flex-wrap gap-x-3 gap-y-1.5 border border-border px-3 py-1.5 mb-8 pointer-events-auto">
           <span className="font-mono text-xs text-muted tracking-[0.15em] uppercase whitespace-nowrap">
             [ {personalInfo.role} ]
           </span>

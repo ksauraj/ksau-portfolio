@@ -316,9 +316,11 @@ html[data-theme='light'] .footer-portrait-light { opacity: 1; }
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  margin: 1.5rem 0;
   border: 1px solid #1A1A1A;
   border-radius: 0.5rem;
+}
+.prose-blog .table-wrapper-container .table-scroll {
+  margin: 0;
 }
 .prose-blog table {
   width: 100%; border-collapse: collapse; font-size: 0.9rem;
@@ -426,6 +428,12 @@ html[data-theme='light'] .skills-terminal img { filter: invert(1); }
   );
   transform: skewX(-20deg);
   animation: code-copy-sweep 0.7s ease-out;
+}
+
+/* One-shot glare sweep for CopyButton (blog action buttons, mermaid copy, table copy) */
+@keyframes copy-sweep {
+  0%   { transform: skewX(-20deg) translateX(-150%); }
+  100% { transform: skewX(-20deg) translateX(150%); }
 }
 
 /* The prose pre already has border/padding; keep copy button clear of code */

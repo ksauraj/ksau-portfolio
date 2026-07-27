@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
 interface ShareButtonProps {
   url: string
@@ -9,12 +9,13 @@ interface ShareButtonProps {
 
 export default function ShareButton({ url, title }: ShareButtonProps) {
   const [copied, setCopied] = useState(false)
+  const [glare, setGlare] = useState(false)
   const [supportsShare, setSupportsShare] = useState(false)
-  const btnRef = useRef<HTMLButtonElement>(null)
+  const timer = useRef<ReturnType<typeof setTimeout>>()
 
-  useEffect(() => {
+  useState(() => {
     setSupportsShare(!!navigator.share)
-  }, [])
+  })
 
   const handleShare = async () => {
     if (supportsShare) {
@@ -28,22 +29,21 @@ export default function ShareButton({ url, title }: ShareButtonProps) {
     // Clipboard fallback
     try {
       await navigator.clipboard.writeText(url)
-      setCopied(true)
-      if (btnRef.current) {
-        btnRef.current.style.setProperty('--sweep', '1')
-      }
-      setTimeout(() => {
-        setCopied(false)
-        if (btnRef.current) btnRef.current.style.setProperty('--sweep', '0')
-      }, 1500)
     } catch {
-      // clipboard not available
+      return
     }
+    setCopied(true)
+    setGlare(true)
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => {
+      setGlare(false)
+      setCopied(false)
+    }, 1500)
   }
 
   return (
     <button
-      ref={btnRef}
+      type="button"
       onClick={handleShare}
       aria-label={copied ? 'Link copied' : 'Share this post'}
       className="relative overflow-hidden font-mono text-xs text-muted hover:text-fg border border-border px-3 py-1.5 transition-colors duration-200 group"
@@ -70,18 +70,16 @@ export default function ShareButton({ url, title }: ShareButtonProps) {
         )}
       </span>
       {/* Glare sweep on copy */}
-      <span
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'linear-gradient(105deg, transparent 0%, rgb(255 255 255 / 0.08) 30%, rgb(255 255 255 / 0.18) 50%, rgb(255 255 255 / 0.08) 70%, transparent 100%)',
-          transform: 'skewX(-20deg) translateX(-150%)',
-          transition: 'transform 0.7s ease-out',
-          // @ts-expect-error CSS custom property
-          '--sweep': '0',
-          translateX: 'var(--sweep) === 1 ? 150% : -150%',
-        }}
-        onTransitionEnd={undefined}
-      />
+      {glare && (
+        <span
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(105deg, transparent 0%, rgb(255 255 255 / 0.08) 30%, rgb(255 255 255 / 0.18) 50%, rgb(255 255 255 / 0.08) 70%, transparent 100%)',
+            transform: 'skewX(-20deg)',
+            animation: 'copy-sweep 0.7s ease-out forwards',
+          }}
+        />
+      )}
     </button>
   )
 }
