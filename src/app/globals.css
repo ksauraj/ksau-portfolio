@@ -54,14 +54,16 @@ html:active-view-transition article {
 }
 
 @keyframes theme-reveal-wave {
-  from { clip-path: circle(0px at var(--theme-origin-x) var(--theme-origin-y)); }
-  to { clip-path: circle(var(--theme-reveal-radius) at var(--theme-origin-x) var(--theme-origin-y)); }
+  0% { clip-path: circle(0px at var(--theme-origin-x) var(--theme-origin-y)); }
+  35% { clip-path: circle(var(--theme-reveal-pause-start) at var(--theme-origin-x) var(--theme-origin-y)); }
+  70% { clip-path: circle(var(--theme-reveal-pause-end) at var(--theme-origin-x) var(--theme-origin-y)); }
+  100% { clip-path: circle(var(--theme-reveal-radius) at var(--theme-origin-x) var(--theme-origin-y)); }
 }
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: var(--theme-transition-duration, 1400ms);
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-duration: var(--theme-transition-duration, 1800ms);
+  animation-timing-function: linear;
   mix-blend-mode: normal;
 }
 

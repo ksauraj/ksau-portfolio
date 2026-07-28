@@ -5,7 +5,7 @@ import BinaryPixelTransition from '@/components/ui/BinaryPixelTransition'
 
 type Theme = 'dark' | 'light'
 type ThemeContextValue = { theme: Theme; toggleTheme: (origin?: { x: number; y: number }) => void }
-type TransitionState = { theme: Theme; origin: { x: number; y: number }; phase: 'reveal' | 'ripple' }
+type TransitionState = { theme: Theme; origin: { x: number; y: number } }
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -43,7 +43,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       window.localStorage.setItem('ksau-theme', next)
     }
 
-    const transitionDuration = 1400
+    const transitionDuration = 1800
     document.documentElement.style.setProperty('--theme-transition-duration', `${transitionDuration}ms`)
     document.documentElement.style.setProperty('--theme-origin-x', `${origin.x}px`)
     document.documentElement.style.setProperty('--theme-origin-y', `${origin.y}px`)
@@ -52,6 +52,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       Math.max(origin.y, window.innerHeight - origin.y),
     )
     document.documentElement.style.setProperty('--theme-reveal-radius', `${revealRadius}px`)
+    document.documentElement.style.setProperty('--theme-reveal-pause-start', `${revealRadius * 0.315}px`)
+    document.documentElement.style.setProperty('--theme-reveal-pause-end', `${revealRadius * 0.357}px`)
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const doc = document as Document & {
@@ -63,12 +65,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    setTransition({ theme: next, origin, phase: 'reveal' })
+    setTransition({ theme: next, origin })
     const viewTransition = doc.startViewTransition(applyTheme)
-    viewTransition.finished.then(
-      () => setTransition((current) => current ? { ...current, phase: 'ripple' } : null),
-      () => setTransition(null),
-    )
+    viewTransition.finished.finally(() => setTransition(null))
   }, [theme])
 
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme])
@@ -77,12 +76,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       {children}
       <BinaryPixelTransition
         active={transition !== null}
-        phase={transition?.phase ?? 'reveal'}
         theme={transition?.theme ?? theme}
         origin={transition?.origin}
-        onComplete={() => {
-          if (transition?.phase === 'ripple') setTransition(null)
-        }}
       />
     </ThemeContext.Provider>
   )
