@@ -13,6 +13,7 @@ type Cell = { x: number; y: number; distance: number; bit: 0 | 1; shimmer: numbe
 type Ripple = { x: number; y: number; maxRadius: number; band: number; delay: number; cells: Cell[] }
 
 const TRANSITION_DURATION = 1800
+const RIPPLE_DURATION = 760
 const RIPPLE_CENTRES = 7
 const MIN_RIPPLE_RADIUS = 25
 const MAX_RIPPLE_RADIUS = 30
@@ -167,7 +168,7 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
     const drawLocalRipple = (ripple: Ripple, elapsed: number) => {
       const localElapsed = elapsed - ripple.delay
       if (localElapsed <= 0) return
-      const rippleProgress = Math.min(localElapsed / (TRANSITION_DURATION * 0.42), 1)
+      const rippleProgress = Math.min(localElapsed / RIPPLE_DURATION, 1)
       const rippleRadius = rippleProgress * ripple.maxRadius
       for (const cell of ripple.cells) {
         const offset = rippleRadius - cell.distance
@@ -180,6 +181,9 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
       }
     }
 
+    const latestRippleEnd = Math.max(...rippleCenters.map((ripple) => ripple.delay + RIPPLE_DURATION))
+    const animationEnd = Math.max(TRANSITION_DURATION, latestRippleEnd)
+
     const draw = (now: number) => {
       if (now - lastFrameAt < FRAME_INTERVAL) {
         frame = requestAnimationFrame(draw)
@@ -191,7 +195,7 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
       context.clearRect(0, 0, width, height)
       drawMainReveal(transitionProgress(progress) * maxRevealRadius)
       for (const ripple of rippleCenters) drawLocalRipple(ripple, elapsed)
-      if (progress < 1) frame = requestAnimationFrame(draw)
+      if (elapsed < animationEnd) frame = requestAnimationFrame(draw)
       else {
         context.clearRect(0, 0, width, height)
         completeRef.current?.()

@@ -66,8 +66,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
 
     setTransition({ theme: next, origin })
-    const viewTransition = doc.startViewTransition(applyTheme)
-    viewTransition.finished.finally(() => setTransition(null))
+    doc.startViewTransition(applyTheme)
   }, [theme])
 
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme])
@@ -78,6 +77,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         active={transition !== null}
         theme={transition?.theme ?? theme}
         origin={transition?.origin}
+        onComplete={() => setTransition(null)}
       />
     </ThemeContext.Provider>
   )
