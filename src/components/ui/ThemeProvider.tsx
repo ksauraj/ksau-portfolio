@@ -5,7 +5,7 @@ import BinaryPixelTransition from '@/components/ui/BinaryPixelTransition'
 
 type Theme = 'dark' | 'light'
 type ThemeContextValue = { theme: Theme; toggleTheme: (origin?: { x: number; y: number }) => void }
-type TransitionState = { theme: Theme; origin: { x: number; y: number } }
+type TransitionState = { theme: Theme; origin: { x: number; y: number }; phase: 'reveal' | 'ripple' }
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -63,16 +63,25 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    setTransition({ theme: next, origin })
+    setTransition({ theme: next, origin, phase: 'reveal' })
     const viewTransition = doc.startViewTransition(applyTheme)
-    viewTransition.finished.finally(() => setTransition(null))
+    viewTransition.finished.then(
+      () => setTransition((current) => current ? { ...current, phase: 'ripple' } : null),
+      () => setTransition(null),
+    )
   }, [theme])
 
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme])
   return (
     <ThemeContext.Provider value={value}>
       {children}
-      <BinaryPixelTransition active={transition !== null} theme={transition?.theme ?? theme} origin={transition?.origin} />
+      <BinaryPixelTransition
+        active={transition !== null}
+        phase={transition?.phase ?? 'reveal'}
+        theme={transition?.theme ?? theme}
+        origin={transition?.origin}
+        onComplete={() => setTransition(null)}
+      />
     </ThemeContext.Provider>
   )
 }

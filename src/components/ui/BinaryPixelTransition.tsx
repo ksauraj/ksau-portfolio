@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 
 interface BinaryPixelTransitionProps {
   active: boolean
+  phase: 'reveal' | 'ripple'
   theme: 'dark' | 'light'
   origin?: { x: number; y: number }
   onComplete?: () => void
@@ -11,10 +12,11 @@ interface BinaryPixelTransitionProps {
 
 const MIN_DURATION = 2500
 const MAX_DURATION = 3000
+const RIPPLE_DURATION = 1800
 const DESKTOP_CELL_SIZE = 11
 const MOBILE_CELL_SIZE = 16
 
-export default function BinaryPixelTransition({ active, theme, origin, onComplete }: BinaryPixelTransitionProps) {
+export default function BinaryPixelTransition({ active, phase, theme, origin, onComplete }: BinaryPixelTransitionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const completeRef = useRef(onComplete)
   completeRef.current = onComplete
@@ -49,6 +51,13 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
     const rows = Math.ceil(height / CELL_SIZE) + 1
     const bits = new Uint8Array(columns * rows)
     for (let i = 0; i < bits.length; i++) bits[i] = Math.random() > 0.5 ? 1 : 0
+    const rippleCenters = phase === 'ripple'
+      ? Array.from({ length: 7 }, () => ({
+          x: width * (0.12 + Math.random() * 0.76),
+          y: height * (0.12 + Math.random() * 0.76),
+          delay: Math.random() * 260,
+        }))
+      : []
 
 
     canvas.width = Math.ceil(width * dpr)
@@ -67,13 +76,16 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
         return
       }
       lastFrameAt = now
-      const progress = Math.min((now - startedAt) / duration, 1)
+      const rawProgress = Math.min((now - startedAt) / (phase === 'ripple' ? RIPPLE_DURATION : duration), 1)
+      const progress = phase === 'reveal' ? 1 - (1 - rawProgress) ** 4 : rawProgress
       const maxRadius = Math.hypot(
         Math.max(originX, width - originX),
         Math.max(originY, height - originY),
       )
       const waveRadius = progress * maxRadius
-      const waveWidth = Math.max(CELL_SIZE * 3, Math.min(120, maxRadius * 0.12))
+      const waveWidth = phase === 'ripple'
+        ? Math.max(CELL_SIZE * 3, Math.min(110, maxRadius * 0.1))
+        : Math.max(CELL_SIZE * 3, Math.min(120, maxRadius * 0.12))
       context.clearRect(0, 0, width, height)
 
       for (let row = 0; row < rows; row++) {
@@ -83,10 +95,26 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
           const distance = Math.hypot(x - originX, y - originY)
           // Keep glyphs behind the reveal boundary: the new background arrives
           // first, then the binary crest follows it like the wake of a ripple.
-          const distanceToWave = waveRadius - distance
-          if (distanceToWave < 0 || distanceToWave > waveWidth) continue
-          const waveGlow = Math.sin((distanceToWave / waveWidth) * Math.PI)
-          const baseAlpha = 0.035 + waveGlow * 0.9
+          let waveGlow = 0
+          if (phase === 'reveal') {
+            const distanceToWave = waveRadius - distance
+            if (distanceToWave < 0 || distanceToWave > waveWidth) continue
+            waveGlow = Math.sin((distanceToWave / waveWidth) * Math.PI)
+          } else {
+            for (const centre of rippleCenters) {
+              const rippleProgress = Math.max(0, Math.min(1, (now - startedAt - centre.delay) / RIPPLE_DURATION))
+              const rippleRadius = rippleProgress * Math.hypot(
+                Math.max(centre.x, width - centre.x),
+                Math.max(centre.y, height - centre.y),
+              )
+              const distanceToRipple = rippleRadius - Math.hypot(x - centre.x, y - centre.y)
+              if (distanceToRipple >= 0 && distanceToRipple <= waveWidth) {
+                waveGlow = Math.max(waveGlow, Math.sin((distanceToRipple / waveWidth) * Math.PI))
+              }
+            }
+            if (waveGlow === 0) continue
+          }
+          const baseAlpha = phase === 'ripple' ? waveGlow * 0.72 : 0.035 + waveGlow * 0.9
           if (baseAlpha < 0.045) continue
           const bit = bits[row * columns + column]
           const shimmer = ((column * 17 + row * 31) % 7) / 7
@@ -98,7 +126,7 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
         }
       }
 
-      if (progress < 1) frame = requestAnimationFrame(draw)
+      if (rawProgress < 1) frame = requestAnimationFrame(draw)
       else {
         context.clearRect(0, 0, width, height)
         completeRef.current?.()
@@ -107,7 +135,7 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
 
     frame = requestAnimationFrame(draw)
     return () => cancelAnimationFrame(frame)
-  }, [active, theme, origin?.x, origin?.y])
+  }, [active, phase, theme, origin?.x, origin?.y])
 
   if (!active) return null
   return <canvas ref={canvasRef} aria-hidden="true" className="binary-pixel-transition" />
