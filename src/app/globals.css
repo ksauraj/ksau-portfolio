@@ -60,7 +60,7 @@ html:active-view-transition article {
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: var(--theme-transition-duration, 2750ms);
+  animation-duration: var(--theme-transition-duration, 1400ms);
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   mix-blend-mode: normal;
 }

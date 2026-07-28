@@ -43,7 +43,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       window.localStorage.setItem('ksau-theme', next)
     }
 
-    const transitionDuration = 2500 + Math.random() * 500
+    const transitionDuration = 1400
     document.documentElement.style.setProperty('--theme-transition-duration', `${transitionDuration}ms`)
     document.documentElement.style.setProperty('--theme-origin-x', `${origin.x}px`)
     document.documentElement.style.setProperty('--theme-origin-y', `${origin.y}px`)
@@ -80,7 +80,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         phase={transition?.phase ?? 'reveal'}
         theme={transition?.theme ?? theme}
         origin={transition?.origin}
-        onComplete={() => setTransition(null)}
+        onComplete={() => {
+          if (transition?.phase === 'ripple') setTransition(null)
+        }}
       />
     </ThemeContext.Provider>
   )
