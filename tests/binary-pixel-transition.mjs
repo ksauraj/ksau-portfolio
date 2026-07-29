@@ -11,6 +11,7 @@ assert.match(provider, /BinaryPixelTransition/, 'provider mounts the canvas tran
 assert.doesNotMatch(provider, /matrixColumns|theme-transition__rain|theme-transition__glare/, 'sparse DOM rain is removed')
 assert.match(pixelGrid, /<canvas/, 'transition uses one canvas rather than thousands of DOM nodes')
 assert.match(pixelGrid, /requestAnimationFrame/, 'transition is frame-driven')
+assert.doesNotMatch(pixelGrid, /FRAME_INTERVAL|lastFrameAt/, 'transition does not discard high-refresh browser frames')
 assert.match(pixelGrid, /DESKTOP_CELL_SIZE\s*=\s*6/, 'desktop local binary cells remain dense')
 assert.match(pixelGrid, /Math\.hypot/, 'binary cells form a radial wave')
 assert.doesNotMatch(pixelGrid, /trailLengths|trailStart|waveY/, 'legacy vertical trails are removed')
