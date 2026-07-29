@@ -12,7 +12,7 @@ assert.match(provider, /origin:\s*\{\s*x:\s*number;\s*y:\s*number\s*\}/, 'provid
 assert.match(provider, /pointerOrigin/, 'provider accepts a viewport-space ripple origin')
 assert.match(transition, /Math\.hypot/, 'canvas renders by radial distance from the toggle')
 assert.match(transition, /rippleRadius/, 'local binary glyphs form expanding circular rings')
-assert.match(transition, /offset < 0 \|\| offset > ripple\.band/, 'local binary crest stays inside its randomized band')
+assert.match(transition, /lowerBound\(ripple\.cells, Math\.max\(0, rippleRadius - ripple\.band\)\)[\s\S]*lowerBound\(ripple\.cells, rippleRadius\)/, 'local binary crest stays inside its randomized band')
 assert.doesNotMatch(transition, /waveY|trailLengths|trailStart/, 'vertical rain geometry is removed')
 assert.match(css, /circle\(0px at var\(--theme-origin-x\).*var\(--theme-origin-y\)/, 'new theme begins clipped at the toggle')
 assert.match(css, /circle\(var\(--theme-reveal-radius\).*var\(--theme-origin-x\).*var\(--theme-origin-y\)/, 'new theme expands radially to cover the viewport')
