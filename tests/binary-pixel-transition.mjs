@@ -15,7 +15,7 @@ assert.match(pixelGrid, /DESKTOP_CELL_SIZE\s*=\s*6/, 'desktop local binary cells
 assert.match(pixelGrid, /Math\.hypot/, 'binary cells form a radial wave')
 assert.doesNotMatch(pixelGrid, /trailLengths|trailStart|waveY/, 'legacy vertical trails are removed')
 assert.match(pixelGrid, /TRANSITION_DURATION\s*=\s*1800/, 'transition duration is synchronized')
-assert.match(pixelGrid, /createCollisionFields/, 'local fields use precomputed collision territories')
+assert.match(pixelGrid, /createRippleFields/, 'overlapping rings use precomputed bounded radial fields')
 assert.match(pixelGrid, /intensity = Math\.sin/, 'ring brightness fades at both edges')
 assert.match(pixelGrid, /lowerBound\(mainCells/, 'main reveal draws only its visible annulus')
 assert.doesNotMatch(css, /theme-transition__(?:glare|rain)/, 'legacy sparse transition styles are removed')

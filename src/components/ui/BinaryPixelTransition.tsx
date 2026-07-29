@@ -16,7 +16,6 @@ type Cell = {
   revealDistance: number
   bit: 0 | 1
   shimmer: number
-  collisionFade: number
 }
 
 type Ripple = {
@@ -24,6 +23,7 @@ type Ripple = {
   y: number
   band: number
   delay: number
+  collisionTime: number
   maxDistance: number
   cells: Cell[]
 }
@@ -35,7 +35,8 @@ const RIPPLE_CENTRES = 7
 const MIN_RIPPLE_BAND_CELLS = 12
 const MAX_RIPPLE_BAND_CELLS = 20
 const WAVE_SPEED = 0.28
-const COLLISION_FADE_DISTANCE = 18
+const COLLISION_OVERLAP_DURATION = 180
+const COLLISION_FADE_DURATION = 420
 const MAIN_DESKTOP_CELL_SIZE = 12
 const MAIN_MOBILE_CELL_SIZE = 16
 const DESKTOP_CELL_SIZE = 6
@@ -81,7 +82,6 @@ function createMainField(center: { x: number; y: number }, width: number, height
         revealDistance: 0,
         bit: Math.random() > 0.5 ? 1 : 0,
         shimmer: 0.72 + (((column * 17 + row * 31) % 7) / 7) * 0.28,
-        collisionFade: 1,
       })
     }
   }
@@ -89,55 +89,52 @@ function createMainField(center: { x: number; y: number }, width: number, height
   return cells
 }
 
-function createCollisionFields(
+function solveCollisionTime(first: RippleSeed, second: RippleSeed) {
+  const distance = Math.hypot(first.x - second.x, first.y - second.y)
+  const laterStart = Math.max(first.delay, second.delay)
+  const firstRadiusAtLaterStart = Math.max(0, laterStart - first.delay) * WAVE_SPEED
+  const secondRadiusAtLaterStart = Math.max(0, laterStart - second.delay) * WAVE_SPEED
+  if (firstRadiusAtLaterStart + secondRadiusAtLaterStart >= distance) return laterStart
+  return laterStart + (distance - firstRadiusAtLaterStart - secondRadiusAtLaterStart) / (2 * WAVE_SPEED)
+}
+
+function createRippleFields(
   seeds: RippleSeed[],
   origin: { x: number; y: number },
   width: number,
   height: number,
   cellSize: number,
 ) {
-  const ripples: Ripple[] = seeds.map((seed) => ({ ...seed, maxDistance: 0, cells: [] }))
-  const columns = Math.ceil(width / cellSize) + 1
-  const rows = Math.ceil(height / cellSize) + 1
-
-  for (let row = 0; row < rows; row++) {
-    const y = row * cellSize + cellSize / 2
-    for (let column = 0; column < columns; column++) {
-      const x = column * cellSize + cellSize / 2
-      let ownerIndex = 0
-      let ownerDistance = Infinity
-      let firstArrival = Infinity
-      let secondArrival = Infinity
-
-      for (let index = 0; index < seeds.length; index++) {
-        const distance = Math.hypot(x - seeds[index].x, y - seeds[index].y)
-        const arrivalTime = seeds[index].delay + distance / WAVE_SPEED
-        if (arrivalTime < firstArrival) {
-          secondArrival = firstArrival
-          firstArrival = arrivalTime
-          ownerIndex = index
-          ownerDistance = distance
-        } else if (arrivalTime < secondArrival) {
-          secondArrival = arrivalTime
-        }
-      }
-
-      const collisionGap = (secondArrival - firstArrival) * WAVE_SPEED
-      const cell: Cell = {
-        x,
-        y,
-        distance: ownerDistance,
-        revealDistance: Math.hypot(x - origin.x, y - origin.y),
-        bit: Math.random() > 0.5 ? 1 : 0,
-        shimmer: 0.72 + (((column * 17 + row * 31) % 7) / 7) * 0.28,
-        collisionFade: Math.min(1, collisionGap / COLLISION_FADE_DISTANCE),
-      }
-      ripples[ownerIndex].cells.push(cell)
-      ripples[ownerIndex].maxDistance = Math.max(ripples[ownerIndex].maxDistance, ownerDistance)
+  const ripples: Ripple[] = seeds.map((seed, index) => {
+    let collisionTime = Infinity
+    for (let other = 0; other < seeds.length; other++) {
+      if (other === index) continue
+      collisionTime = Math.min(collisionTime, solveCollisionTime(seed, seeds[other]))
     }
-  }
+    const endTime = collisionTime + COLLISION_OVERLAP_DURATION + COLLISION_FADE_DURATION
+    const maxDistance = Math.max(0, endTime - seed.delay) * WAVE_SPEED
+    return { ...seed, collisionTime, maxDistance, cells: [] }
+  })
 
   for (const ripple of ripples) {
+    const left = Math.max(0, ripple.x - ripple.maxDistance)
+    const right = Math.min(width, ripple.x + ripple.maxDistance)
+    const top = Math.max(0, ripple.y - ripple.maxDistance)
+    const bottom = Math.min(height, ripple.y + ripple.maxDistance)
+    for (let y = top; y <= bottom; y += cellSize) {
+      for (let x = left; x <= right; x += cellSize) {
+        const distance = Math.hypot(x - ripple.x, y - ripple.y)
+        if (distance > ripple.maxDistance) continue
+        ripple.cells.push({
+          x,
+          y,
+          distance,
+          revealDistance: Math.hypot(x - origin.x, y - origin.y),
+          bit: Math.random() > 0.5 ? 1 : 0,
+          shimmer: 0.72 + Math.random() * 0.28,
+        })
+      }
+    }
     ripple.cells.sort((a, b) => a.distance - b.distance)
   }
   return ripples
@@ -188,7 +185,7 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
         delay: revealArrival * TRANSITION_DURATION,
       }
     })
-    const rippleCenters = createCollisionFields(rippleSeeds, center, width, height, cellSize)
+    const rippleCenters = createRippleFields(rippleSeeds, center, width, height, cellSize)
 
     canvas.width = Math.ceil(width * dpr)
     canvas.height = Math.ceil(height * dpr)
@@ -220,6 +217,15 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
     const drawLocalRipple = (ripple: Ripple, elapsed: number, revealedRadius: number) => {
       const localElapsed = elapsed - ripple.delay
       if (localElapsed <= 0) return
+      const collisionElapsed = elapsed - ripple.collisionTime
+      const collisionGlow = collisionElapsed <= 0
+        ? 1
+        : 1 + Math.max(0, 1 - collisionElapsed / COLLISION_OVERLAP_DURATION) * 0.8
+      const fadeElapsed = collisionElapsed - COLLISION_OVERLAP_DURATION
+      const collisionOpacity = fadeElapsed <= 0
+        ? 1
+        : Math.max(0, 1 - fadeElapsed / COLLISION_FADE_DURATION) ** 2
+      if (collisionOpacity <= 0) return
       const rippleRadius = localElapsed * WAVE_SPEED
       const from = lowerBound(ripple.cells, Math.max(0, rippleRadius - ripple.band))
       const to = lowerBound(ripple.cells, rippleRadius)
@@ -228,16 +234,16 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
         if (cell.revealDistance > revealedRadius) continue
         const offset = rippleRadius - cell.distance
         const intensity = Math.sin((offset / ripple.band) * Math.PI)
-        const alpha = intensity * cell.shimmer * cell.collisionFade * 0.95
+        const alpha = Math.min(1, intensity * cell.shimmer * collisionGlow * collisionOpacity * 0.95)
         if (alpha < 0.08) continue
         context.fillStyle = `rgba(${rgb},${alpha})`
         context.fillText(cell.bit ? '1' : '0', cell.x, cell.y)
       }
     }
 
-    const latestRippleEnd = Math.max(
-      ...rippleCenters.map((ripple) => ripple.delay + (ripple.maxDistance + ripple.band) / WAVE_SPEED),
-    )
+    const latestRippleEnd = Math.max(...rippleCenters.map(
+      (ripple) => ripple.collisionTime + COLLISION_OVERLAP_DURATION + COLLISION_FADE_DURATION,
+    ))
     const animationEnd = Math.max(TRANSITION_DURATION, latestRippleEnd)
 
     const draw = (now: number) => {
