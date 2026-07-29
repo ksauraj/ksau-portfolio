@@ -31,7 +31,8 @@ type Ripple = {
 type RippleSeed = Pick<Ripple, 'x' | 'y' | 'band' | 'delay'>
 
 const TRANSITION_DURATION = 1800
-const RIPPLE_CENTRES = 7
+const MOBILE_RIPPLE_CENTRES = 7
+const DESKTOP_RIPPLE_CENTRES = 18
 const MIN_RIPPLE_BAND_CELLS = 12
 const MAX_RIPPLE_BAND_CELLS = 20
 const WAVE_SPEED = 0.28
@@ -159,6 +160,9 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
     const width = window.innerWidth
     const height = window.innerHeight
     const isMobile = window.matchMedia('(max-width: 768px), (pointer: coarse)').matches
+    const rippleCount = isMobile ? MOBILE_RIPPLE_CENTRES : DESKTOP_RIPPLE_CENTRES
+    const rippleColumns = Math.ceil(Math.sqrt(rippleCount * width / height))
+    const rippleRows = Math.ceil(rippleCount / rippleColumns)
     const cellSize = isMobile ? MOBILE_CELL_SIZE : DESKTOP_CELL_SIZE
     const mainCellSize = isMobile ? MAIN_MOBILE_CELL_SIZE : MAIN_DESKTOP_CELL_SIZE
     const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.25)
@@ -169,11 +173,11 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
       Math.max(center.y, height - center.y),
     )
 
-    const rippleSeeds: RippleSeed[] = Array.from({ length: RIPPLE_CENTRES }, (_, index) => {
-      const column = index % 3
-      const row = Math.floor(index / 3)
-      const x = width * ((column + 0.2 + Math.random() * 0.6) / 3)
-      const y = height * ((row + 0.2 + Math.random() * 0.6) / 3)
+    const rippleSeeds: RippleSeed[] = Array.from({ length: rippleCount }, (_, index) => {
+      const column = index % rippleColumns
+      const row = Math.floor(index / rippleColumns)
+      const x = width * ((column + 0.2 + Math.random() * 0.6) / rippleColumns)
+      const y = height * ((row + 0.2 + Math.random() * 0.6) / rippleRows)
       const distanceFromOrigin = Math.hypot(x - center.x, y - center.y)
       const revealArrival = transitionArrival(Math.min(1, distanceFromOrigin / maxRevealRadius))
       const bandCells = MIN_RIPPLE_BAND_CELLS
