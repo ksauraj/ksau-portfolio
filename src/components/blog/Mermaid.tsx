@@ -115,13 +115,22 @@ export default function Mermaid({ chart }: { chart: string }) {
     }, 1500)
   }, [chart])
 
-  // Wheel: ctrl/cmd+wheel or trackpad pinch → zoom; plain wheel scrolls page.
-  const onWheel = useCallback((e: React.WheelEvent) => {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault()
-      const factor = e.deltaY < 0 ? 1.1 : 0.9
-      setScale((s) => clampScale(s * factor))
+  // React delegates wheel events; a direct non-passive listener reliably cancels
+  // Chrome's native modifier-wheel page scroll while the diagram consumes it.
+  useEffect(() => {
+    const viewport = viewportRef.current
+    if (!viewport) return
+
+    const handleWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return
+      event.preventDefault()
+      event.stopPropagation()
+      const factor = event.deltaY < 0 ? 1.1 : 0.9
+      setScale((current) => clampScale(current * factor))
     }
+
+    viewport.addEventListener('wheel', handleWheel, { passive: false })
+    return () => viewport.removeEventListener('wheel', handleWheel)
   }, [])
 
   // Pointer drag → pan
@@ -214,7 +223,6 @@ export default function Mermaid({ chart }: { chart: string }) {
       {/* Resizable (vertical only), zoom/pannable viewport */}
       <div
         ref={viewportRef}
-        onWheel={onWheel}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
