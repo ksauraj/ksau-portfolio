@@ -32,8 +32,8 @@ type RippleSeed = Pick<Ripple, 'x' | 'y' | 'band' | 'delay'>
 
 const TRANSITION_DURATION = 1800
 const RIPPLE_CENTRES = 7
-const MIN_RIPPLE_BAND = 10
-const MAX_RIPPLE_BAND = 15
+const MIN_RIPPLE_BAND_CELLS = 12
+const MAX_RIPPLE_BAND_CELLS = 20
 const WAVE_SPEED = 0.28
 const COLLISION_FADE_DISTANCE = 18
 const MAIN_DESKTOP_CELL_SIZE = 12
@@ -179,10 +179,12 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
       const y = height * ((row + 0.2 + Math.random() * 0.6) / 3)
       const distanceFromOrigin = Math.hypot(x - center.x, y - center.y)
       const revealArrival = transitionArrival(Math.min(1, distanceFromOrigin / maxRevealRadius))
+      const bandCells = MIN_RIPPLE_BAND_CELLS
+        + Math.random() * (MAX_RIPPLE_BAND_CELLS - MIN_RIPPLE_BAND_CELLS)
       return {
         x,
         y,
-        band: MIN_RIPPLE_BAND + Math.random() * (MAX_RIPPLE_BAND - MIN_RIPPLE_BAND),
+        band: bandCells * cellSize,
         delay: revealArrival * TRANSITION_DURATION,
       }
     })
