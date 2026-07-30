@@ -295,6 +295,8 @@ html[data-theme='light'] .footer-portrait-light { opacity: 1; }
   padding: 0.15rem 0.4rem;
   border-radius: 4px;
   color: #FFFFFF;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 /* Code blocks (rehype-pretty-code) */
 .prose-blog pre {

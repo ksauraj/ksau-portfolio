@@ -165,7 +165,9 @@ export default function Mermaid({ chart }: { chart: string }) {
       e.preventDefault()
       const [a, b] = [e.touches[0], e.touches[1]]
       const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)
-      setScale(clampScale(pinch.current.scale * (dist / pinch.current.dist)))
+      const baseDist = pinch.current.dist
+      const baseScale = pinch.current.scale
+      setScale(() => clampScale(baseScale * (dist / baseDist)))
     }
   }
   const onTouchEnd = () => {
@@ -255,7 +257,7 @@ export default function Mermaid({ chart }: { chart: string }) {
         )}
       </div>
       <div className="border-t border-border px-3 py-1.5 bg-surface">
-        <span className="font-mono text-[10px] text-muted/60">
+        <span className="font-mono text-[13px] text-muted/60">
           drag to pan · ctrl/⌘+scroll or pinch to zoom · drag bottom edge to resize
         </span>
       </div>

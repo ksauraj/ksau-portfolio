@@ -28,5 +28,14 @@ assert.doesNotMatch(
   /onWheel=\{/,
   'React delegated wheel handling is not used for cancellable zoom input',
 )
+assert.ok(
+  mermaid.includes("setScale(() => clampScale(baseScale * (dist / baseDist)))"),
+  'pinch zoom uses a functional setScale for compounding during the gesture',
+)
+assert.match(
+  mermaid,
+  /text-\[13px\]/,
+  'footer text uses a legible desktop font size for the command icon character',
+)
 
-console.log('Mermaid modifier-wheel scroll lock contract: ok')
+console.log('Mermaid modifier-wheel scroll lock & pinch-zoom contract: ok')
