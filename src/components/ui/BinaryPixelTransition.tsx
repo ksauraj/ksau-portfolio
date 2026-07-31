@@ -42,7 +42,7 @@ const MAIN_DESKTOP_CELL_SIZE = 12
 const MAIN_MOBILE_CELL_SIZE = 16
 const DESKTOP_CELL_SIZE = 6
 const MOBILE_CELL_SIZE = 8
-const FRAME_INTERVAL = 1000 / 30
+
 
 // Medium start, near-pause through the middle, fast finish.
 function transitionProgress(progress: number) {
@@ -201,7 +201,6 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
     context.textBaseline = 'middle'
     const rgb = theme === 'dark' ? '255,255,255' : '17,24,39'
     let frame = 0
-    let lastFrameAt = -Infinity
 
     const mainCells = createMainField(center, width, height, mainCellSize)
     const drawMainReveal = (radius: number) => {
@@ -251,11 +250,6 @@ export default function BinaryPixelTransition({ active, theme, origin, onComplet
     const animationEnd = Math.max(TRANSITION_DURATION, latestRippleEnd)
 
     const draw = (now: number) => {
-      if (now - lastFrameAt < FRAME_INTERVAL) {
-        frame = requestAnimationFrame(draw)
-        return
-      }
-      lastFrameAt = now
       const elapsed = now - startedAt
       const progress = Math.min(elapsed / TRANSITION_DURATION, 1)
       const revealedRadius = transitionProgress(progress) * maxRevealRadius
