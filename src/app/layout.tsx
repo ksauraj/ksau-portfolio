@@ -93,6 +93,14 @@ export const metadata: Metadata = {
   category: 'technology',
 }
 
+// Explicit viewport config to ensure pinch-to-zoom works on mobile/touch devices
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+}
+
 // Structured data: identifies the person + site for search engines and AI engines.
 const personLd = {
   '@context': 'https://schema.org',
