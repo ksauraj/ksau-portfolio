@@ -1,7 +1,7 @@
 # Blog content
 
 Posts are plain Markdown files in this directory. Drop a `.md` file here and it
-shows up automatically — the filename (minus `.md`) becomes the URL slug, e.g.
+shows up automatically - the filename (minus `.md`) becomes the URL slug, e.g.
 `csi-drivers.md` → `/blog/csi-drivers`.
 
 ## Frontmatter
@@ -56,18 +56,18 @@ graph LR
 ````
 
 Prefer **left-to-right** layouts (`graph LR`, or `direction LR` inside
-subgraphs) — they read best in landscape. Sequence diagrams are horizontal by
+subgraphs) - they read best in landscape. Sequence diagrams are horizontal by
 default.
 
 ### Embeds
 
-- **YouTube / iframes** — paste a raw `<iframe>`; it gets a responsive 16:9
+- **YouTube / iframes** - paste a raw `<iframe>`; it gets a responsive 16:9
   wrapper automatically.
-- **Video files** — a raw `<video src="...">` gets controls + lazy loading.
-- **Images** — standard `![alt](/path.jpg)` markdown; served unoptimized (static
+- **Video files** - a raw `<video src="...">` gets controls + lazy loading.
+- **Images** - standard `![alt](/path.jpg)` markdown; served unoptimized (static
   export), lazy-loaded, with the site's rounded-border styling.
 
 ## After adding a post
 
 The build regenerates the index, RSS feed (`/rss.xml`), and sitemap
-automatically. Just commit the `.md` file — no code changes needed.
+automatically. Just commit the `.md` file - no code changes needed.
