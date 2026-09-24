@@ -1,7 +1,7 @@
 ---
-title: "CRI-O: The Container Runtime Built for Kubernetes — A Complete History and Technical Deep Dive"
+title: "CRI-O: The Container Runtime Built for Kubernetes - A Complete History and Technical Deep Dive"
 date: "2026-07-19"
-excerpt: "From the CRI specification to dockershim removal to production default — the complete story of CRI-O, its architecture, its relationship to OCI and runc, how it differs from containerd, and why it matters."
+excerpt: "From the CRI specification to dockershim removal to production default - the complete story of CRI-O, its architecture, its relationship to OCI and runc, how it differs from containerd, and why it matters."
 tags: ["cri-o", "kubernetes", "cri", "oci", "containers", "devops", "history"]
 ---
 
@@ -19,7 +19,7 @@ This was simple for users but fragile for Kubernetes:
 
 - **API coupling:** Kubernetes was tied to Docker's specific API version. A breaking change in Docker's API required a Kubernetes release to adapt.
 - **Feature coupling:** Kubernetes wanted features like container checkpointing and sandbox isolation that Docker didn't prioritize.
-- **Competitive pressure:** Docker, Inc. was developing its own orchestration tool (Docker Swarm) — a direct competitor. The Kubernetes community didn't want their project's core runtime controlled by a competitor.
+- **Competitive pressure:** Docker, Inc. was developing its own orchestration tool (Docker Swarm) - a direct competitor. The Kubernetes community didn't want their project's core runtime controlled by a competitor.
 
 Then in 2015, Docker, Inc. announced **rkt** (pronounced "rocket"), a competing container runtime from CoreOS. The Kubernetes community realized they needed a **plugin interface**, not a SDK dependency.
 
@@ -27,10 +27,10 @@ Then in 2015, Docker, Inc. announced **rkt** (pronounced "rocket"), a competing 
 
 Before CRI, there was OCI. In June 2015, Docker, CoreOS, Google, Red Hat, and others formed the **Open Container Initiative** under the Linux Foundation. OCI defined two specifications:
 
-1. **OCI Image Spec (v1.0, July 2017):** How container images are built, stored, and named — layers, manifests, configs. This is why `docker build` output can run on CRI-O, containerd, Podman, or any OCI-compatible runtime.
-2. **OCI Runtime Spec (v1.0, July 2017):** What happens at runtime — the filesystem bundle, the configuration JSON (config.json), and the lifecycle (create, start, stop, delete). This is what `runc` implements.
+1. **OCI Image Spec (v1.0, July 2017):** How container images are built, stored, and named - layers, manifests, configs. This is why `docker build` output can run on CRI-O, containerd, Podman, or any OCI-compatible runtime.
+2. **OCI Runtime Spec (v1.0, July 2017):** What happens at runtime - the filesystem bundle, the configuration JSON (config.json), and the lifecycle (create, start, stop, delete). This is what `runc` implements.
 
-OCI created a common language: any OCI image can run on any OCI-compatible runtime. But it didn't solve the Kubernetes integration problem — there was still no standard way for kubelet to *tell* a runtime to run a container.
+OCI created a common language: any OCI image can run on any OCI-compatible runtime. But it didn't solve the Kubernetes integration problem - there was still no standard way for kubelet to *tell* a runtime to run a container.
 
 ```mermaid
 timeline
@@ -50,7 +50,7 @@ timeline
 
 ## Act 2: The CRI Specification
 
-In June 2016, the Kubernetes community proposed the **Container Runtime Interface (CRI)** — a protobuf-based gRPC API that would become the standard contract between kubelet and any container runtime.
+In June 2016, the Kubernetes community proposed the **Container Runtime Interface (CRI)** - a protobuf-based gRPC API that would become the standard contract between kubelet and any container runtime.
 
 The CRI specification defined two gRPC services:
 
@@ -101,21 +101,21 @@ The key insight of CRI is the **Pod Sandbox** concept. A Pod is not a container;
 
 ### The dockershim compromise
 
-Docker never implemented CRI natively. Instead, the Kubernetes community built a bridge called **dockershim** — a translation layer that lived inside the Kubernetes source tree at `pkg/kubelet/dockershim/`. It received CRI calls from kubelet and translated them into Docker API calls.
+Docker never implemented CRI natively. Instead, the Kubernetes community built a bridge called **dockershim** - a translation layer that lived inside the Kubernetes source tree at `pkg/kubelet/dockershim/`. It received CRI calls from kubelet and translated them into Docker API calls.
 
 The dockershim was explicitly intended as a temporary solution. It added latency (every CRI call became two calls: CRI → Docker API → containerd), it duplicated code, and it locked Kubernetes into Docker's specific behavior. But it allowed users to keep using Docker while CRI-compliant runtimes matured.
 
-That "temporary" shim lasted **six years** — from Kubernetes v1.5 (December 2016) through v1.23 (December 2021). It was finally removed in **Kubernetes v1.24** (May 2022), forcing every cluster onto a CRI-compliant runtime.
+That "temporary" shim lasted **six years** - from Kubernetes v1.5 (December 2016) through v1.23 (December 2021). It was finally removed in **Kubernetes v1.24** (May 2022), forcing every cluster onto a CRI-compliant runtime.
 
 ## Act 3: CRI-O Is Born
 
-While dockershim was being built, Red Hat engineers saw a cleaner path. If Kubernetes needed a CRI-compliant runtime, why not build one from scratch — one that didn't carry Docker's legacy API, didn't need a shim, and was optimized exclusively for kubelet's use case?
+While dockershim was being built, Red Hat engineers saw a cleaner path. If Kubernetes needed a CRI-compliant runtime, why not build one from scratch - one that didn't carry Docker's legacy API, didn't need a shim, and was optimized exclusively for kubelet's use case?
 
 The project, initially called **oci-unite** and then **CRI-O**, was announced in December 2016. The first commit was made by Antonio Murdaca (Runcom) and Mrunal Patel. The project's stated goal:
 
 > *CRI-O is an implementation of the Kubernetes CRI to enable using OCI (Open Container Initiative) compatible runtimes. It is a lightweight alternative to using Docker, Moby or rkt as the runtime for Kubernetes.*
 
-The name says it all: **C**RI **O**CI — the bridge between the Kubernetes CRI and OCI-compliant runtimes.
+The name says it all: **C**RI **O**CI - the bridge between the Kubernetes CRI and OCI-compliant runtimes.
 
 ### The architecture
 
@@ -155,7 +155,7 @@ graph TB
 - **Exit code file**, written atomically by conmon when the container exits. This is how `kubectl get pods` shows `Status: Completed` vs `Status: Error`.
 - **Signal forwarding**. When kubelet sends `SIGTERM` to a container, CRI-O calls `StopContainer`, which tells conmon to forward the signal. Conmon sends `SIGTERM` and, after a timeout, `SIGKILL`.
 
-Because conmon is a C program, it avoids Go's garbage collection pauses and scheduler latency. This matters for signal delivery — when kubelet says "stop this container in 30 seconds," conmon can deliver the `SIGKILL` at precisely the right millisecond without GC interference.
+Because conmon is a C program, it avoids Go's garbage collection pauses and scheduler latency. This matters for signal delivery - when kubelet says "stop this container in 30 seconds," conmon can deliver the `SIGKILL` at precisely the right millisecond without GC interference.
 
 **4. runc / crun:** The OCI runtime receives the bundle (a directory containing `config.json` and the rootfs) and makes the final Linux system calls: `clone(2)` with `CLONE_NEWNS | CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWPID | CLONE_NEWNET | CLONE_NEWUSER` to create namespaces, `unshare(2)` for the cgroup namespace, `pivot_root(2)` to change the mount point, and `execve(2)` to start the container's init process.
 
@@ -204,8 +204,8 @@ The pause container (from `registry.k8s.io/pause:3.9`) runs first and holds the 
 
 CRI-O uses two libraries from the containers ecosystem:
 
-- **`containers/image`** — handles pulling images from registries (Docker Hub, Quay, GCR, private registries with auth). Supports OCI format, Docker format, and transparent decompression.
-- **`containers/storage`** — manages the local image and container store (layers, mounts, overlayfs). This is the same library used by Podman, Buildah, and Skopeo.
+- **`containers/image`** - handles pulling images from registries (Docker Hub, Quay, GCR, private registries with auth). Supports OCI format, Docker format, and transparent decompression.
+- **`containers/storage`** - manages the local image and container store (layers, mounts, overlayfs). This is the same library used by Podman, Buildah, and Skopeo.
 
 Images are stored using overlayfs: each layer is a separate directory, and the writable container layer is an overlay mount combining all layers. This is identical to how Docker stores images, but using the shared `containers/storage` library instead of Docker's proprietary graphdriver.
 
@@ -216,20 +216,20 @@ CRI-O and containerd are the two dominant CRI implementations. They solve the sa
 | Aspect | CRI-O | containerd |
 |--------|-------|------------|
 | **Origin** | Red Hat, 2016, purpose-built for CRI | Docker, Inc., 2017, extracted from Docker engine |
-| **CRI implementation** | Native — every CRI call maps to one code path | Through `cri-containerd` plugin, which is a CRI shim over containerd's internal API |
+| **CRI implementation** | Native - every CRI call maps to one code path | Through `cri-containerd` plugin, which is a CRI shim over containerd's internal API |
 | **Codebase size** | ~80K lines of Go | ~200K lines of Go + C bindings |
 | **Image management** | `containers/image` + `containers/storage` (shared with Podman, Buildah) | Built-in content store (derived from Docker's distribution library) |
 | **CLI tools** | `crictl` (shared with containerd), `crioctl` (deprecated), `podman` (for debugging) | `crictl`, `ctr` (containerd's own CLI) |
 | **Default in** | OpenShift 4.x, Fedora CoreOS, RHEL 9+, openSUSE MicroOS | GKE (historical default), EKS, AKS, Docker Desktop, Rancher |
 | **Pause image** | `k8s.gcr.io/pause:3.9` | Same (both use Kubernetes-provided pause) |
-| **SELinux support** | First-class — per-pod MCS labels, automatic context assignment | Supported but historically needed manual configuration |
-| **CRIU support** | Built-in — `criu` integration for checkpoint/restore | Via containerd's checkpoint plugin |
+| **SELinux support** | First-class - per-pod MCS labels, automatic context assignment | Supported but historically needed manual configuration |
+| **CRIU support** | Built-in - `criu` integration for checkpoint/restore | Via containerd's checkpoint plugin |
 | **Startup time (cold cache)** | ~1–2s per Pod | ~1–3s per Pod |
 | **Resident memory (idle)** | ~30MB (CRI-O daemon) | ~50MB (containerd daemon) |
 
 ### The SELinux advantage
 
-CRI-O's tight integration with SELinux is its strongest differentiator. On Red Hat-based systems (RHEL, CentOS, Fedora CoreOS, OpenShift), SELinux is mandatory — the system enforces it even if you don't configure it.
+CRI-O's tight integration with SELinux is its strongest differentiator. On Red Hat-based systems (RHEL, CentOS, Fedora CoreOS, OpenShift), SELinux is mandatory - the system enforces it even if you don't configure it.
 
 CRI-O assigns every Pod a unique **MCS (Multi-Category Security)** label:
 
@@ -238,7 +238,7 @@ system_u:system_r:container_t:s0:c128,c512
 ```
 
 The labels `c128,c512` are randomly generated per Pod. Because every Pod gets a unique label, SELinux prevents:
-- Container A reading Container B's files (different MCS categories — SELinux denies cross-category access)
+- Container A reading Container B's files (different MCS categories - SELinux denies cross-category access)
 - Container A sending signals to Container B's processes (SELinux denies cross-category process signaling)
 - A compromised container writing to the host filesystem (the type `container_t` is denied write access to host types like `etc_t`, `bin_t`, `var_t`)
 
@@ -248,14 +248,14 @@ This is zero-config container isolation enforced by the kernel. Even if `runc` h
 
 A practical difference that matters in production: CRI-O's image garbage collector understands which images are in use by running containers via **pinned references**. It will never garbage-collect a layer that's referenced by a running container.
 
-containerd's GC, historically, used a mark-and-sweep algorithm that could race with container startup — a pulled-but-not-yet-running container's layers could be swept. This caused `ImagePullBackOff` errors after node reboots where the GC ran before kubelet recreated Pods. CRI-O avoids this entirely because its storage backend (`containers/storage`) uses reference counting that the GC respects.
+containerd's GC, historically, used a mark-and-sweep algorithm that could race with container startup - a pulled-but-not-yet-running container's layers could be swept. This caused `ImagePullBackOff` errors after node reboots where the GC ran before kubelet recreated Pods. CRI-O avoids this entirely because its storage backend (`containers/storage`) uses reference counting that the GC respects.
 
 ### The conmon edge (detailed)
 
 conmon deserves its own section because it's one of the most elegant pieces of the CRI-O architecture.
 
 ```c
-// conmon — pseudocode for the core loop
+// conmon - pseudocode for the core loop
 int main(int argc, char *argv[]) {
     int masterfd = open_ptmx();        // pseudo-terminal master
     int logfd = open_logfile(argv);    // stdout/stderr log
@@ -312,7 +312,7 @@ int main(int argc, char *argv[]) {
 The critical design decision: conmon is a **C program**, not Go. This means:
 - No Go runtime overhead (no GC, no goroutine scheduler) for the tight polling loop
 - Atomic exit-code file writing without GC pauses
-- Reliable signal delivery — `SIGTERM` from CRI-O reaches the container's init process within microseconds, not milliseconds
+- Reliable signal delivery - `SIGTERM` from CRI-O reaches the container's init process within microseconds, not milliseconds
 - Minimal memory (~2MB vs ~10MB for a Go equivalent)
 
 ## CRI-O in the Post-dockershim Era
@@ -327,14 +327,14 @@ The data (as of 2025–2026):
 | CRI-O | ~25% | OpenShift, Fedora CoreOS, RHEL, on-prem hardened clusters |
 | Other (CRI dockerd, rktlet, frakti) | ~10% | Legacy or specialized |
 
-containerd's adoption lead is largely inherited from Docker — containerd was extracted from Docker Engine in 2017, so clusters that migrated from Docker to containerd had a natural path. CRI-O's adoption is concentrated in environments that value SELinux integration, minimalism, and Red Hat support.
+containerd's adoption lead is largely inherited from Docker - containerd was extracted from Docker Engine in 2017, so clusters that migrated from Docker to containerd had a natural path. CRI-O's adoption is concentrated in environments that value SELinux integration, minimalism, and Red Hat support.
 
 ### When to choose CRI-O
 
-1. **You're running OpenShift.** OpenShift 4.x uses CRI-O as the only supported runtime. This is not optional — it's a requirement.
+1. **You're running OpenShift.** OpenShift 4.x uses CRI-O as the only supported runtime. This is not optional - it's a requirement.
 2. **You're on RHEL / Fedora CoreOS.** SELinux is mandatory on these systems, and CRI-O's SELinux integration is the best in class. containerd works, but CRI-O is the recommended and default option.
 3. **You want the minimal attack surface.** CRI-O's codebase (~80K LOC) is significantly smaller than containerd's (~200K LOC). Fewer lines of code = fewer potential vulnerabilities.
-4. **You need CRIU checkpoint/restore.** CRI-O has native support for checkpointing running containers and restoring them elsewhere — useful for live migration, cluster autoscaler, and node-drain scenarios.
+4. **You need CRIU checkpoint/restore.** CRI-O has native support for checkpointing running containers and restoring them elsewhere - useful for live migration, cluster autoscaler, and node-drain scenarios.
 5. **You're building a Kubernetes distro.** If you're packaging Kubernetes for a specific use case (edge, IoT, telco), CRI-O's narrow scope makes it easier to audit, customize, and embed.
 
 ### Configuring CRI-O
@@ -389,7 +389,7 @@ Here's a minimal CRI-O configuration (`/etc/crio/crio.conf`):
 
 ## Debugging CRI-O
 
-### crictl — the universal CRI debug tool
+### crictl - the universal CRI debug tool
 
 `crictl` talks to any CRI-compliant runtime via its socket. It's the single best debugging tool:
 
@@ -447,9 +447,9 @@ crictl info
 
 CRI-O is part of a broader Red Hat container toolchain that shares the `containers/storage` and `containers/image` libraries:
 
-- **Podman** — a drop-in replacement for `docker` CLI that runs containers rootless. `podman run` creates containers using the same OCI runtimes (runc, crun) that CRI-O uses.
-- **Buildah** — builds OCI images without requiring a container runtime (no `docker build` dependency).
-- **Skopeo** — inspects, copies, and signs container images across registries without pulling them locally.
+- **Podman** - a drop-in replacement for `docker` CLI that runs containers rootless. `podman run` creates containers using the same OCI runtimes (runc, crun) that CRI-O uses.
+- **Buildah** - builds OCI images without requiring a container runtime (no `docker build` dependency).
+- **Skopeo** - inspects, copies, and signs container images across registries without pulling them locally.
 
 On a Fedora CoreOS node running CRI-O, you can use `podman` to debug containers directly on the node without SSH-ing into containers, because Podman and CRI-O share the same storage backend.
 
@@ -463,7 +463,7 @@ sudo podman inspect registry.k8s.io/pause:3.9
 
 ## The Mental Model
 
-> CRI-O is the shortest path between kubelet and the Linux kernel for running containers. It translates every CRI call into an OCI bundle, delegates the actual container lifecycle to runc or crun, uses conmon to hold the stdout/stderr pipes and exit codes, and enforces SELinux separation between every Pod. It has no features Kubernetes doesn't need, no Docker compatibility layer, and no external API beyond the CRI gRPC contract. It is the container runtime that was designed for Kubernetes from day one — and after dockershim's removal, it's the runtime that every Kubernetes distribution that values minimalism, security, and Red Hat integration builds on.
+> CRI-O is the shortest path between kubelet and the Linux kernel for running containers. It translates every CRI call into an OCI bundle, delegates the actual container lifecycle to runc or crun, uses conmon to hold the stdout/stderr pipes and exit codes, and enforces SELinux separation between every Pod. It has no features Kubernetes doesn't need, no Docker compatibility layer, and no external API beyond the CRI gRPC contract. It is the container runtime that was designed for Kubernetes from day one - and after dockershim's removal, it's the runtime that every Kubernetes distribution that values minimalism, security, and Red Hat integration builds on.
 
 ---
 

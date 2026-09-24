@@ -1,13 +1,13 @@
 ---
 title: "Networking in Kubernetes: From the Four Axioms to Production Traffic"
 date: "2026-05-09"
-excerpt: "A complete walk through the Kubernetes networking model — the design principles from 2014, how CNI plugins implement them, the mechanics of kube-proxy, DNS, policy, and the evolution to Gateway API."
+excerpt: "A complete walk through the Kubernetes networking model - the design principles from 2014, how CNI plugins implement them, the mechanics of kube-proxy, DNS, policy, and the evolution to Gateway API."
 tags: ["kubernetes", "networking", "devops", "cni", "kube-proxy"]
 ---
 
 Kubernetes networking is the most complex, most misunderstood, and most critical subsystem in the entire platform. Every pod, every service, every ingress, every inter-node packet flows through a stack of components that were designed by some of the sharpest minds in distributed systems.
 
-This post breaks that stack down layer by layer — from the abstract design principles to the concrete iptables rules on your nodes.
+This post breaks that stack down layer by layer - from the abstract design principles to the concrete iptables rules on your nodes.
 
 ---
 
@@ -20,15 +20,15 @@ The original design document, circulated in 2014, established four axioms:
 1. Every Pod gets its own unique, cluster-wide IP address.
 2. Every Pod can reach every other Pod directly, across any node, without NAT.
 3. Every node can reach every Pod on itself and on every other node.
-4. Communication from a Pod to itself via `localhost` reaches its own containers — the Pod shares a network namespace.
+4. Communication from a Pod to itself via `localhost` reaches its own containers - the Pod shares a network namespace.
 
-These four rules sound simple, but their implications are profound. They mean Kubernetes treats every Pod like a VM or a physical host on a flat LAN. Applications that were written for a traditional network — bind to a port, listen, accept connections — work inside a Pod without modification.
+These four rules sound simple, but their implications are profound. They mean Kubernetes treats every Pod like a VM or a physical host on a flat LAN. Applications that were written for a traditional network - bind to a port, listen, accept connections - work inside a Pod without modification.
 
 ### The pause container trick
 
 Axiom 4 is enabled by an elegant hack: the **pause container** (`registry.k8s.io/pause:3.9`, about 700KB). Before any application container starts, kubelet instructs the container runtime to create a "sandbox" (called a `PodSandbox` in CRI parlance) using the pause image. This container does nothing but `pause(2)` forever, holding the network namespace open. All other containers in the Pod join that namespace via `--network=container:<pause>`.
 
-The result: every container in a Pod shares the same IP, the same port space, and the same localhost. `localhost:8080` in container A reaches a service listening on `:8080` in container B. No DNS, no discovery, no environment variables — just the kernel's loopback interface.
+The result: every container in a Pod shares the same IP, the same port space, and the same localhost. `localhost:8080` in container A reaches a service listening on `:8080` in container B. No DNS, no discovery, no environment variables - just the kernel's loopback interface.
 
 ```mermaid
 graph TB
@@ -49,7 +49,7 @@ graph TB
 
 ## The CNI Specification
 
-The third axiom — every node can reach every Pod — is the hard part. Kubernetes deliberately does not implement it inside the core binary. Instead, it delegates to the **Container Network Interface (CNI)**, a specification originally developed by CoreOS as part of the rkt project and adopted by Kubernetes in 2015.
+The third axiom - every node can reach every Pod - is the hard part. Kubernetes deliberately does not implement it inside the core binary. Instead, it delegates to the **Container Network Interface (CNI)**, a specification originally developed by CoreOS as part of the rkt project and adopted by Kubernetes in 2015.
 
 ### How the CNI contract works
 
@@ -89,7 +89,7 @@ Every CNI plugin implements the same contract, but they do it completely differe
 
 The simplest and oldest. Flannel was created alongside CoreOS's rkt initiative and was the default CNI for many early Kubernetes deployments.
 
-**Architecture:** Flanneld runs as a DaemonSet on every node. Each node is allocated a `/24` subnet from the cluster CIDR (e.g., `10.244.0.0/16` → node A gets `10.244.1.0/24`, node B gets `10.244.2.0/24`). Pods on the same node communicate via a Linux bridge (`cni0`). Pods on different nodes communicate through an **overlay tunnel** — by default VXLAN (UDP port 8472).
+**Architecture:** Flanneld runs as a DaemonSet on every node. Each node is allocated a `/24` subnet from the cluster CIDR (e.g., `10.244.0.0/16` → node A gets `10.244.1.0/24`, node B gets `10.244.2.0/24`). Pods on the same node communicate via a Linux bridge (`cni0`). Pods on different nodes communicate through an **overlay tunnel** - by default VXLAN (UDP port 8472).
 
 ```text
 Pod A (10.244.1.2) on Node A → ping Pod B (10.244.2.3) on Node B
@@ -110,23 +110,23 @@ Pod A (10.244.1.2) on Node A → ping Pod B (10.244.2.3) on Node B
 
 Calico takes the opposite approach: **no overlay, pure L3 routing**. It treats the cluster as a giant IP fabric where every node is a router.
 
-**Architecture:** Calico uses **BGP (Border Gateway Protocol)** — the same protocol that powers the Internet's backbone — to distribute pod subnet routes between nodes. Each node runs a BGP client (Felix + Bird or the newer Calico node) that peers with other nodes (full mesh) or with route reflectors.
+**Architecture:** Calico uses **BGP (Border Gateway Protocol)** - the same protocol that powers the Internet's backbone - to distribute pod subnet routes between nodes. Each node runs a BGP client (Felix + Bird or the newer Calico node) that peers with other nodes (full mesh) or with route reflectors.
 
 ```mermaid
 graph TB
-    subgraph NODEA["Node A — 10.244.1.0/24"]
+    subgraph NODEA["Node A - 10.244.1.0/24"]
         P1["Pod 10.244.1.2"]
         P2["Pod 10.244.1.3"]
         BR["cali* veth pair"]
         ETH["eth0: 192.168.1.10"]
     end
-    subgraph NODEB["Node B — 10.244.2.0/24"]
+    subgraph NODEB["Node B - 10.244.2.0/24"]
         P3["Pod 10.244.2.2"]
         P4["Pod 10.244.2.3"]
         BR2["cali* veth pair"]
         ETH2["eth0: 192.168.1.11"]
     end
-    subgraph NODEC["Node C — 10.244.3.0/24"]
+    subgraph NODEC["Node C - 10.244.3.0/24"]
         P5["Pod 10.244.3.2"]
         BR3["cali* veth pair"]
         ETH3["eth0: 192.168.1.12"]
@@ -140,9 +140,9 @@ graph TB
     NODEB -.->|Direct L3| NODEC
 ```
 
-When a pod on Node A sends to a pod on Node B, the packet goes straight through the host's routing table — the kernel looks up `10.244.2.0/24 → via 192.168.1.11 dev eth0` and forwards the raw IP packet. No encapsulation, no extra headers. This gives Calico the best throughput of any CNI plugin in most configurations.
+When a pod on Node A sends to a pod on Node B, the packet goes straight through the host's routing table - the kernel looks up `10.244.2.0/24 → via 192.168.1.11 dev eth0` and forwards the raw IP packet. No encapsulation, no extra headers. This gives Calico the best throughput of any CNI plugin in most configurations.
 
-**Performance:** Near line rate. Latency overhead is sub-microsecond (just a kernel routing table lookup). The flip side is that Calico requires the underlay network to route the pod CIDRs — which means you either need BGP support in your physical network, or you accept the complexity of running BGP route reflectors.
+**Performance:** Near line rate. Latency overhead is sub-microsecond (just a kernel routing table lookup). The flip side is that Calico requires the underlay network to route the pod CIDRs - which means you either need BGP support in your physical network, or you accept the complexity of running BGP route reflectors.
 
 **eBPF mode:** Since 2021, Calico supports an **eBPF data plane** that replaces iptables with BPF programs attached to the host's TC hooks. This eliminates iptables rule traversal overhead and enables features like direct server return (DSR) for load balancing.
 
@@ -150,14 +150,14 @@ When a pod on Node A sends to a pod on Node B, the packet goes straight through 
 
 ### Cilium (2017, Isovalent)
 
-Cilium is the newest major CNI and represents the next generation. It was built entirely around **eBPF (extended Berkeley Packet Filter)** — a Linux kernel technology that allows running sandboxed programs in kernel space without modifying kernel code.
+Cilium is the newest major CNI and represents the next generation. It was built entirely around **eBPF (extended Berkeley Packet Filter)** - a Linux kernel technology that allows running sandboxed programs in kernel space without modifying kernel code.
 
 **Architecture:** Cilium does not use iptables at all. Instead, it compiles network policies and routing decisions into eBPF bytecode and attaches that bytecode to kernel hooks:
 
 | Hook | Purpose |
 |------|---------|
 | **TC (Traffic Control) ingress/egress** | Pod-to-pod and pod-to-service packet handling |
-| **XDP (eXpress Data Path)** | Early packet processing before the kernel stack — used for DDoS protection and load balancing |
+| **XDP (eXpress Data Path)** | Early packet processing before the kernel stack - used for DDoS protection and load balancing |
 | **cgroup socket** | Per-socket policy enforcement |
 | **tracepoint/kprobe** | Observability (Hubble) |
 
@@ -198,11 +198,11 @@ The AWS VPC CNI takes a completely different approach: instead of overlays, it a
 
 1. An `aws-node` DaemonSet runs on each node, creating a pool of Elastic Network Interfaces (ENIs) and warm-IP pools.
 2. When a Pod starts, the plugin picks an IP from the warm pool, creates a veth pair, attaches one end to the Pod, and programs the host's routing table to point the Pod's IP to the veth's host end.
-3. Because the Pod's IP is a real VPC IP, the AWS network fabric routes traffic natively — no overlay, no encapsulation, no BGP.
+3. Because the Pod's IP is a real VPC IP, the AWS network fabric routes traffic natively - no overlay, no encapsulation, no BGP.
 
 | Aspect | AWS VPC CNI | Overlay CNI |
 |--------|-------------|-------------|
-| IP exhaustion | Fast — every Pod consumes a VPC IP | Slow — only nodes need VPC IPs |
+| IP exhaustion | Fast - every Pod consumes a VPC IP | Slow - only nodes need VPC IPs |
 | Throughput | Line rate (no overhead) | 90–95% of line rate |
 | Security groups | Per-Pod via security groups | Per-node only |
 | ENI limits | Bounded by instance type | Unlimited |
@@ -216,7 +216,7 @@ kube-proxy is the component that makes Services work. It's been part of Kubernet
 
 ### Userspace mode (legacy, removed in v1.26)
 
-The original kube-proxy ran as a userspace proxy. It opened a port for every ClusterIP:port combination and proxied connections to backend Pods. This was simple but slow — every packet had to transition from kernel → userspace (kube-proxy) → kernel → backend, a round-trip that added 100–200µs of latency per packet.
+The original kube-proxy ran as a userspace proxy. It opened a port for every ClusterIP:port combination and proxied connections to backend Pods. This was simple but slow - every packet had to transition from kernel → userspace (kube-proxy) → kernel → backend, a round-trip that added 100–200µs of latency per packet.
 
 ```text
 Client → ClusterIP:80 → kernel → kube-proxy (userspace) → kernel → backend Pod
@@ -245,7 +245,7 @@ For every Service, kube-proxy writes a chain of rules:
 -A KUBE-SEP-CCC -p tcp -j DNAT --to-destination 10.244.2.6:8080
 ```
 
-**The performance problem:** iptables rules are evaluated **linearly** in the kernel. Each packet traverses the entire chain until it finds a match. With 1000 services, that's tens of thousands of rules to check. Under load, each packet can spend 5–10µs traversing the rule chain. At 100K packets per second, that's 0.5–1 second of CPU time per second — a full core.
+**The performance problem:** iptables rules are evaluated **linearly** in the kernel. Each packet traverses the entire chain until it finds a match. With 1000 services, that's tens of thousands of rules to check. Under load, each packet can spend 5–10µs traversing the rule chain. At 100K packets per second, that's 0.5–1 second of CPU time per second - a full core.
 
 ```mermaid
 graph LR
@@ -293,7 +293,7 @@ TCP  10.96.0.11:443 rr
 
 kube-proxy installs rules not just for ClusterIP, but also for NodePort and LoadBalancer Services:
 
-**NodePort:** kube-proxy writes a rule matching `--dport <NodePort>` on every node's IP. But if a NodePort request arrives at Node A and all backend Pods are on Node B, the reply from Pod B goes directly back to the client — the client sees a reply from Node B's IP, not Node A's. To fix this, kube-proxy also installs a **MASQUERADE rule** that SNATs traffic going to another node's Pods, rewriting the source to the node's IP.
+**NodePort:** kube-proxy writes a rule matching `--dport <NodePort>` on every node's IP. But if a NodePort request arrives at Node A and all backend Pods are on Node B, the reply from Pod B goes directly back to the client - the client sees a reply from Node B's IP, not Node A's. To fix this, kube-proxy also installs a **MASQUERADE rule** that SNATs traffic going to another node's Pods, rewriting the source to the node's IP.
 
 ```bash
 # Masquerade rule for NodePort (cluster traffic)
@@ -306,7 +306,7 @@ kube-proxy installs rules not just for ClusterIP, but also for NodePort and Load
 
 ## CoreDNS
 
-Before v1.13, Kubernetes used **kube-dns** (a three-container pod: dnsmasq, etcd-backed skydns, and a health checker). Since v1.13, **CoreDNS** has been the default — a single, extensible, Go-based DNS server.
+Before v1.13, Kubernetes used **kube-dns** (a three-container pod: dnsmasq, etcd-backed skydns, and a health checker). Since v1.13, **CoreDNS** has been the default - a single, extensible, Go-based DNS server.
 
 CoreDNS runs as a Deployment behind a ClusterIP Service. Every Pod has `/etc/resolv.conf` pointing to the CoreDNS ClusterIP:
 
@@ -324,7 +324,7 @@ CoreDNS can also resolve **external DNS** via upstream resolvers (e.g., `8.8.8.8
 
 ## NetworkPolicy
 
-NetworkPolicy is a firewall specification for Pods. It operates at L3/L4 and is enforced by the CNI plugin — not by Kubernetes itself. If your CNI doesn't support NetworkPolicy (Flannel, older Weave), all policies are silently accepted and ignored.
+NetworkPolicy is a firewall specification for Pods. It operates at L3/L4 and is enforced by the CNI plugin - not by Kubernetes itself. If your CNI doesn't support NetworkPolicy (Flannel, older Weave), all policies are silently accepted and ignored.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -418,9 +418,9 @@ But Ingress has limitations that led to its successor:
 
 The Gateway API is the evolution of Ingress, developed by the SIG-Network since 2020. It separates concerns into three layers:
 
-1. **GatewayClass** — defines a type of gateway (e.g., "istio", "contour", "nginx").
-2. **Gateway** — the infrastructure-level object, representing a load balancer or proxy instance.
-3. **HTTPRoute / TCPRoute / TLSRoute** — application-level routing rules attached to a Gateway.
+1. **GatewayClass** - defines a type of gateway (e.g., "istio", "contour", "nginx").
+2. **Gateway** - the infrastructure-level object, representing a load balancer or proxy instance.
+3. **HTTPRoute / TCPRoute / TLSRoute** - application-level routing rules attached to a Gateway.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -473,7 +473,7 @@ The Gateway API supports traffic splitting natively (the weight fields), cross-n
 
 When a Pod sends traffic to an external IP (anything outside the cluster CIDR), the packet faces the same fundamental problem as a Docker container or a home laptop: its source IP (`10.244.x.x`) is private and unroutable on the public internet.
 
-The node performs **masquerading (SNAT)** — rewriting the source to the node's own IP:
+The node performs **masquerading (SNAT)** - rewriting the source to the node's own IP:
 
 ```bash
 iptables -t nat -A POSTROUTING -s 10.244.0.0/16 ! -d 10.244.0.0/16 -j MASQUERADE
@@ -481,10 +481,10 @@ iptables -t nat -A POSTROUTING -s 10.244.0.0/16 ! -d 10.244.0.0/16 -j MASQUERADE
 
 For fine-grained egress control, you can use:
 
-- **Egress NAT gateways** — dedicated nodes that SNAT traffic for a set of Pods, providing a stable egress IP for IP-whitelisted external services.
-- **Egress traffic via a proxy** — configure Pods to route HTTP/S traffic through an explicit forward proxy (Squid, Envoy).
-- **NetworkPolicy egress rules** — restrict which external CIDRs a Pod can reach.
-- **Cilium Egress Gateway** — maps a group of Pods to a specific node's IP for egress, bypassing the default MASQUERADE.
+- **Egress NAT gateways** - dedicated nodes that SNAT traffic for a set of Pods, providing a stable egress IP for IP-whitelisted external services.
+- **Egress traffic via a proxy** - configure Pods to route HTTP/S traffic through an explicit forward proxy (Squid, Envoy).
+- **NetworkPolicy egress rules** - restrict which external CIDRs a Pod can reach.
+- **Cilium Egress Gateway** - maps a group of Pods to a specific node's IP for egress, bypassing the default MASQUERADE.
 
 ## The Complete Packet Walk
 
@@ -526,9 +526,9 @@ sequenceDiagram
 
 ## The Mental Model
 
-> The Kubernetes networking model says every Pod has a unique, routable IP and direct reachability — a flat network. CNI plugins implement this reachability using overlays (Flannel), L3 routing (Calico), or eBPF (Cilium). kube-proxy then layers on top the Service abstraction — a virtual IP that exists only as a NAT rule, maintained by iptables or IPVS. DNS, NetworkPolicy, and Ingress/Gateway API complete the picture by adding service discovery, firewalling, and north-south traffic routing respectively.
+> The Kubernetes networking model says every Pod has a unique, routable IP and direct reachability - a flat network. CNI plugins implement this reachability using overlays (Flannel), L3 routing (Calico), or eBPF (Cilium). kube-proxy then layers on top the Service abstraction - a virtual IP that exists only as a NAT rule, maintained by iptables or IPVS. DNS, NetworkPolicy, and Ingress/Gateway API complete the picture by adding service discovery, firewalling, and north-south traffic routing respectively.
 
-Every component in this stack — the CNI plugin, kube-proxy, CoreDNS, the Ingress controller — has a single, well-defined responsibility. When you understand what each one does, the whole stack becomes comprehensible.
+Every component in this stack - the CNI plugin, kube-proxy, CoreDNS, the Ingress controller - has a single, well-defined responsibility. When you understand what each one does, the whole stack becomes comprehensible.
 
 ---
 

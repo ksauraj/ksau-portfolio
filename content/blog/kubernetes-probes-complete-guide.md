@@ -1,11 +1,11 @@
 ---
 title: "Liveness, Readiness, and Startup Probes: The Complete Guide"
 date: "2026-06-03"
-excerpt: "How Kubernetes knows if a container is actually working — the history of probes, how each handler type works under the hood, the timing mechanics every operator should know, and production patterns for reliability."
+excerpt: "How Kubernetes knows if a container is actually working - the history of probes, how each handler type works under the hood, the timing mechanics every operator should know, and production patterns for reliability."
 tags: ["kubernetes", "probes", "liveness", "readiness", "devops", "observability"]
 ---
 
-A container process is running. That does not mean the application inside it is healthy. The database connection pool could be exhausted. The application could be deadlocked in a goroutine. The cache might not be warm yet. The process itself is alive — but it can't serve traffic.
+A container process is running. That does not mean the application inside it is healthy. The database connection pool could be exhausted. The application could be deadlocked in a goroutine. The cache might not be warm yet. The process itself is alive - but it can't serve traffic.
 
 This is the fundamental gap that Kubernetes probes exist to fill. They are the mechanism by which kubelet, the node agent, asks a question that has no answer in the kernel: **is this container actually doing useful work?**
 
@@ -17,8 +17,8 @@ In the earliest versions of Kubernetes (2014–2015), kubelet had a single, crud
 
 This was insufficient for two reasons:
 
-1. **Deadlocks** — a process can be alive in the kernel sense (the PID exists, no signal delivered) while the application inside is completely stuck.
-2. **Slow starts** — a Java application takes 60 seconds to warm its JIT compiler, load caches, and open database connections. The process starts immediately, but it's not ready for traffic.
+1. **Deadlocks** - a process can be alive in the kernel sense (the PID exists, no signal delivered) while the application inside is completely stuck.
+2. **Slow starts** - a Java application takes 60 seconds to warm its JIT compiler, load caches, and open database connections. The process starts immediately, but it's not ready for traffic.
 
 The solution was formalized in Kubernetes v1.0 (July 2015) with two new fields in the Pod spec: `livenessProbe` and `readinessProbe`. A third probe, `startupProbe`, was added in v1.16 (September 2019) to address the slow-start problem more elegantly.
 
@@ -26,7 +26,7 @@ The solution was formalized in Kubernetes v1.0 (July 2015) with two new fields i
 
 ## The Three Probes
 
-### LivenessProbe — Is the application still alive?
+### LivenessProbe - Is the application still alive?
 
 The liveness probe answers a binary question: **should this container be killed and restarted?**
 
@@ -52,13 +52,13 @@ spec:
         successThreshold: 1
 ```
 
-**What it should check:** The core process health — is the event loop running? Is the goroutine pool not deadlocked? Is the database connection pool not exhausted? It should NOT check external dependencies (a downstream Redis, a third-party API) because those failures are transient and killing the container won't fix them.
+**What it should check:** The core process health - is the event loop running? Is the goroutine pool not deadlocked? Is the database connection pool not exhausted? It should NOT check external dependencies (a downstream Redis, a third-party API) because those failures are transient and killing the container won't fix them.
 
-### ReadinessProbe — Is the application ready to serve traffic?
+### ReadinessProbe - Is the application ready to serve traffic?
 
 The readiness probe answers a different question: **should this Pod receive traffic?**
 
-It also runs continuously. When it fails, the Pod is removed from all Service EndpointSlices — no traffic is routed to it. But the container is NOT killed. This is the critical difference from liveness.
+It also runs continuously. When it fails, the Pod is removed from all Service EndpointSlices - no traffic is routed to it. But the container is NOT killed. This is the critical difference from liveness.
 
 ```yaml
       readinessProbe:
@@ -72,13 +72,13 @@ It also runs continuously. When it fails, the Pod is removed from all Service En
         successThreshold: 1
 ```
 
-**What it should check:** Is the application ready to handle requests right now? Is the cache warm? Has the leader election completed? Is the database migrated? These conditions are transient — the application may become ready again without needing a restart.
+**What it should check:** Is the application ready to handle requests right now? Is the cache warm? Has the leader election completed? Is the database migrated? These conditions are transient - the application may become ready again without needing a restart.
 
-### StartupProbe — Has the container finished starting?
+### StartupProbe - Has the container finished starting?
 
 The startup probe solves a timing problem. Some applications take a long time to start (JVM warmup, loading ML models, restoring from snapshots). Without a startup probe, a slow-starting application would fail its liveness probe multiple times during boot and get killed before it ever became healthy.
 
-Before startup probes existed, the only solution was to set a large `initialDelaySeconds` on the liveness probe — a crude guess that wasted time when the container started quickly.
+Before startup probes existed, the only solution was to set a large `initialDelaySeconds` on the liveness probe - a crude guess that wasted time when the container started quickly.
 
 ```yaml
       startupProbe:
@@ -156,7 +156,7 @@ livenessProbe:
   timeoutSeconds: 3
 ```
 
-**Under the hood:** kubelet creates an `http.Client` with a `Timeout` equal to `timeoutSeconds`. It dials the Pod's IP directly (not through the Service — bypassing kube-proxy), constructs the GET request, sends it, and reads the response body (up to 64KB, immediately discarded). Any error or wrong status code marks the probe as failed.
+**Under the hood:** kubelet creates an `http.Client` with a `Timeout` equal to `timeoutSeconds`. It dials the Pod's IP directly (not through the Service - bypassing kube-proxy), constructs the GET request, sends it, and reads the response body (up to 64KB, immediately discarded). Any error or wrong status code marks the probe as failed.
 
 **Gotcha:** If your application has authentication middleware that requires a bearer token for `/healthz`, the probe needs to either bypass the auth (add `httpHeaders` with the token, or exclude `/healthz` from the auth middleware). A common pattern is to run the health endpoint on a separate port (e.g., `:8081` for health, `:8080` for application traffic) and exclude the health port from authentication.
 
@@ -172,9 +172,9 @@ readinessProbe:
   timeoutSeconds: 3
 ```
 
-**Under the hood:** kubelet calls `net.DialTimeout("tcp", "POD_IP:port", timeout)`. If the dial succeeds, the connection is immediately closed. kubelet does NOT send any data — it's purely a connectivity check. This means a TCP probe will succeed even if the application behind the port is returning garbage — as long as the TCP handshake completes.
+**Under the hood:** kubelet calls `net.DialTimeout("tcp", "POD_IP:port", timeout)`. If the dial succeeds, the connection is immediately closed. kubelet does NOT send any data - it's purely a connectivity check. This means a TCP probe will succeed even if the application behind the port is returning garbage - as long as the TCP handshake completes.
 
-**Best for:** Protocols that don't have an HTTP endpoint or where implementing one is impractical — MySQL, Redis, Postgres, custom binary protocols.
+**Best for:** Protocols that don't have an HTTP endpoint or where implementing one is impractical - MySQL, Redis, Postgres, custom binary protocols.
 
 **Gotcha:** A TCP probe only verifies that the port is open. If the application is accepting connections but returning errors on every request, the TCP probe will still report success.
 
@@ -219,7 +219,7 @@ livenessProbe:
 
 ---
 
-## The Timing Parameters — What Every Operator Gets Wrong
+## The Timing Parameters - What Every Operator Gets Wrong
 
 The interplay between the five timing parameters is the most misunderstood part of probes:
 
@@ -247,14 +247,14 @@ gantt
     Probe 2 (success, 30ms)     : 10050ms, 10080ms
     Wait periodSeconds 10s      : 10080ms, 20080ms
 
-    section Under load — timeout
+    section Under load - timeout
     Probe 3 (timeout at 3s)     : 20080ms, 23080ms
     Wait periodSeconds 10s      : 23080ms, 33080ms
     Probe 4 (starts late)       : 33080ms, 33120ms
     Wait periodSeconds 10s      : 33120ms, 43120ms
 ```
 
-Under load, each timeout pushes subsequent probes later and later. If `timeoutSeconds` is close to `periodSeconds` (say 8s and 10s), a single timeout causes the probe schedule to drift by nearly a full period. On a node with hundreds of Pods, this drift can cause **probe storms** where many Pods get probed simultaneously — increasing load on the application and causing further timeouts in a cascading failure.
+Under load, each timeout pushes subsequent probes later and later. If `timeoutSeconds` is close to `periodSeconds` (say 8s and 10s), a single timeout causes the probe schedule to drift by nearly a full period. On a node with hundreds of Pods, this drift can cause **probe storms** where many Pods get probed simultaneously - increasing load on the application and causing further timeouts in a cascading failure.
 
 **The fix:** Keep `timeoutSeconds` low relative to `periodSeconds`. A 3:10 ratio (3s timeout, 10s period) is safe. Never set them closer than 1:2.
 
@@ -283,7 +283,7 @@ For a startup probe with `failureThreshold: 30`, `periodSeconds: 5`, `timeoutSec
 ### Pattern 1: Separate health endpoints
 
 ```go
-// /healthz — liveness: is the process alive?
+// /healthz - liveness: is the process alive?
 func healthz(w http.ResponseWriter, r *http.Request) {
     if !eventLoopRunning.Load() {
         w.WriteHeader(http.StatusServiceUnavailable)
@@ -292,7 +292,7 @@ func healthz(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusOK)
 }
 
-// /ready — readiness: can we serve traffic?
+// /ready - readiness: can we serve traffic?
 func ready(w http.ResponseWriter, r *http.Request) {
     if !cacheWarm.Load() {
         w.WriteHeader(http.StatusServiceUnavailable)
@@ -387,7 +387,7 @@ The liveness probe runs every 30 seconds and does a lightweight check. The readi
 
 ### Pattern 5: What NOT to probe
 
-- **External APIs:** If a third-party API is down, killing your container won't fix it. Worse — if all replicas of your service are killed simultaneously, the cluster experiences a full outage for a transient upstream issue.
+- **External APIs:** If a third-party API is down, killing your container won't fix it. Worse - if all replicas of your service are killed simultaneously, the cluster experiences a full outage for a transient upstream issue.
 - **Database:** Same argument. If the DB is slow, killing the container and restarting creates a thundering herd as all Pods reconnect simultaneously.
 - **Redis/Memcached:** A cache miss is not a reason to kill the container.
 
@@ -440,20 +440,20 @@ $ kubectl logs my-app-7d4f8b9c6f-3gh4j --previous
 $ kubectl exec my-app-7d4f8b9c6f-3gh4j -- curl -s http://localhost:8080/healthz
 ```
 
-**The thundering herd problem:** When all replicas of a Deployment are killed simultaneously by a liveness probe (e.g., because a shared DB is slow), they all restart at the same time, all attempt to reconnect at the same time, and the DB falls over again — repeating the cycle. The solution is to use the readiness probe (not liveness) for dependency checks, so Pods are removed from traffic without being killed.
+**The thundering herd problem:** When all replicas of a Deployment are killed simultaneously by a liveness probe (e.g., because a shared DB is slow), they all restart at the same time, all attempt to reconnect at the same time, and the DB falls over again - repeating the cycle. The solution is to use the readiness probe (not liveness) for dependency checks, so Pods are removed from traffic without being killed.
 
 ---
 
 ## The Mental Model
 
-> A running process is not a healthy application. The liveness probe kills containers that are alive but deadlocked. The readiness probe removes Pods from traffic when they can't serve, without killing them. The startup probe gives slow-booting applications time to initialize before the other probes begin. Together, they form Kubernetes's mechanism for distinguishing *process health* from *application health* — a distinction that does not exist at the operating system level and had to be invented at the orchestration layer.
+> A running process is not a healthy application. The liveness probe kills containers that are alive but deadlocked. The readiness probe removes Pods from traffic when they can't serve, without killing them. The startup probe gives slow-booting applications time to initialize before the other probes begin. Together, they form Kubernetes's mechanism for distinguishing *process health* from *application health* - a distinction that does not exist at the operating system level and had to be invented at the orchestration layer.
 
 ---
 
 ## References
 
 - [Configure Liveness, Readiness and Startup Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
-- [Kubernetes Probes — Source Code (pkg/kubelet/prober)](https://github.com/kubernetes/kubernetes/tree/master/pkg/kubelet/prober)
+- [Kubernetes Probes - Source Code (pkg/kubelet/prober)](https://github.com/kubernetes/kubernetes/tree/master/pkg/kubelet/prober)
 - [Pod Lifecycle](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/)
 - [Container Probe Documentation (API Reference)](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#probe-v1-core)
 - [gRPC Health Checking Protocol](https://github.com/grpc/grpc/blob/master/doc/health-checking.md)
