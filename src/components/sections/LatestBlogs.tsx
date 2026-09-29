@@ -1,39 +1,18 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import ScrollReveal from '@/components/ui/ScrollReveal'
+import { getAllPosts } from '@/lib/blog'
+import { BLOG_URL } from '@/lib/site'
+import { formatDate } from '@/lib/date'
 
-interface PostMeta {
-  slug: string
-  title: string
-  date: string
-  excerpt: string
-  tags: string[]
-  readingTime: string
-}
-
-export default function LatestBlogs() {
-  const [posts, setPosts] = useState<PostMeta[]>([])
-
-  useEffect(() => {
-    fetch('/blog/index.json')
-      .then((r) => r.json())
-      .catch(() => {
-        // Fallback: grab from the page if embedded
-        const el = document.getElementById('__BLOG_INDEX__')
-        if (el) {
-          try {
-            setPosts(JSON.parse(el.textContent || '[]').slice(0, 3))
-          } catch {
-            // silent
-          }
-        }
-      })
-      .then((data: PostMeta[]) => setPosts(data.slice(0, 3)))
-  }, [])
-
+/**
+ * Homepage "Latest Writing" cards. Server component: the posts are read
+ * from the blog's RSS feed at build time and baked into the static HTML.
+ * Each card links out to the post on the blog site.
+ */
+export default async function LatestBlogs() {
+  const posts = await getAllPosts()
   if (posts.length === 0) return null
+
+  const latest = posts.slice(0, 3)
 
   return (
     <section
@@ -54,29 +33,35 @@ export default function LatestBlogs() {
                 Notes from<br />the terminal.
               </h2>
             </div>
-            <Link
-              href="/blog"
+            <a
+              href={BLOG_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="hidden sm:inline-flex font-mono text-xs text-muted hover:text-fg border border-border px-4 py-2.5 transition-colors"
             >
               [ View all → ]
-            </Link>
+            </a>
           </div>
         </ScrollReveal>
 
         <div className="grid gap-6 md:grid-cols-3">
-          {posts.map((post, i) => (
+          {latest.map((post, i) => (
             <ScrollReveal key={post.slug} delay={i * 0.1}>
-              <Link href={`/blog/${post.slug}`} className="block group h-full">
-                <article className="card-hover-glare animate-tile-flicker border border-border bg-card p-6 md:p-8 transition-shadow duration-300 h-full flex flex-col"
+              <a
+                href={post.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block group h-full"
+              >
+                <article
+                  className="card-hover-glare animate-tile-flicker border border-border bg-card p-6 md:p-8 transition-shadow duration-300 h-full flex flex-col"
                   style={{
                     ['--flicker-dur' as string]: `${9 + i * 2}s`,
                     ['--flicker-delay' as string]: `${i * 1.5}s`,
                   } as React.CSSProperties}
                 >
                   <div className="flex flex-wrap items-center gap-3 mb-4 font-mono text-xs text-muted">
-                    <span>{post.date}</span>
-                    <span className="text-fg/20">·</span>
-                    <span>{post.readingTime}</span>
+                    <span>{formatDate(post.date)}</span>
                   </div>
                   <h3 className="font-display font-semibold text-fg text-xl mb-3 group-hover:text-fg-dim transition-colors line-clamp-2">
                     {post.title}
@@ -95,19 +80,21 @@ export default function LatestBlogs() {
                     ))}
                   </div>
                 </article>
-              </Link>
+              </a>
             </ScrollReveal>
           ))}
         </div>
 
         {/* Mobile "View all" link */}
         <div className="mt-8 text-center sm:hidden">
-          <Link
-            href="/blog"
+          <a
+            href={BLOG_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex font-mono text-xs text-muted hover:text-fg border border-border px-4 py-2.5 transition-colors"
           >
             [ View all posts → ]
-          </Link>
+          </a>
         </div>
       </div>
     </section>

@@ -1,17 +1,15 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from '@/components/ui/ThemeProvider'
 import { personalInfo } from '@/data/content'
+import { BLOG_URL } from '@/lib/site'
 
 const links = ['Home', 'Skills', 'Experience', 'Projects']
 const sectionId = (link: string) => link.replace(/[^a-z]/gi, '').toLowerCase()
 
 export default function Navbar() {
-  const pathname = usePathname()
-  const onBlog = pathname?.startsWith('/blog') ?? false
   const { scrollY } = useScroll()
   const { theme, toggleTheme } = useTheme()
   const bg = useTransform(scrollY, [0, 80], ['rgb(var(--theme-nav) / 0)', 'rgb(var(--theme-nav) / 0.88)'])
@@ -19,9 +17,7 @@ export default function Navbar() {
   const [active, setActive] = useState('home')
 
   // Scroll-spy: highlight whichever section is currently in view.
-  // Only runs on the homepage — blog routes have no such sections.
   useEffect(() => {
-    if (onBlog) return
     const ids = links.map(sectionId)
     const sections = ids
       .map((id) => document.getElementById(id))
@@ -39,7 +35,7 @@ export default function Navbar() {
 
     sections.forEach((el) => observer.observe(el))
     return () => observer.disconnect()
-  }, [onBlog])
+  }, [])
 
   return (
     <motion.nav
@@ -54,8 +50,7 @@ export default function Navbar() {
       <div className="hidden md:flex items-center gap-8">
         {links.map((link) => {
           const id = sectionId(link)
-          // On blog routes nothing in this list is active.
-          const isActive = !onBlog && active === id
+          const isActive = active === id
           return (
             <a
               key={link}
@@ -78,17 +73,14 @@ export default function Navbar() {
             </a>
           )
         })}
-        {/* Blog is a separate route, not an in-page anchor. */}
+        {/* Blog lives on its own site - external link, not an in-page anchor. */}
         <a
-          href="/blog"
-          aria-current={onBlog ? 'true' : undefined}
-          className={`font-body text-sm transition-colors duration-200 relative group ${
-            onBlog ? 'text-fg btn-glare px-1' : 'text-fg/70 hover:text-fg'
-          }`}
+          href={BLOG_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-body text-sm text-fg/70 hover:text-fg transition-colors duration-200 relative group"
         >
-          {onBlog ? <span className="font-mono text-fg/50">&lt;&nbsp;</span> : null}
           Blog
-          {onBlog ? <span className="font-mono text-fg/50">&nbsp;&gt;</span> : null}
           <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-fg group-hover:w-full transition-all duration-300" />
         </a>
       </div>
