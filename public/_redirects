@@ -1,0 +1,10 @@
+/blog  https://blog.ksauraj.eu.org/  301
+/blog/  https://blog.ksauraj.eu.org/  301
+/blog/networking-in-kubernetes  https://blog.ksauraj.eu.org/posts/2026/05/09/networking-in-kubernetes/  301
+/blog/why-istio-when-kube-proxy-exists  https://blog.ksauraj.eu.org/posts/2026/05/11/why-istio-when-kube-proxy-exists/  301
+/blog/kubernetes-probes-complete-guide  https://blog.ksauraj.eu.org/posts/2026/06/03/kubernetes-probes-complete-guide/  301
+/blog/kubernetes-security-contexts-deep-dive  https://blog.ksauraj.eu.org/posts/2026/07/13/kubernetes-security-contexts-deep-dive/  301
+/blog/cri-o-complete-history-deep-dive  https://blog.ksauraj.eu.org/posts/2026/07/19/cri-o-complete-history-deep-dive/  301
+/blog/csi-drivers  https://blog.ksauraj.eu.org/posts/2026/07/25/csi-drivers/  301
+/blog/nat-explained  https://blog.ksauraj.eu.org/posts/2026/07/26/nat-explained/  301
+/rss.xml  https://blog.ksauraj.eu.org/feed.xml  301
